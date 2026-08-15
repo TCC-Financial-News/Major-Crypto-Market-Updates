@@ -2752,12 +2752,13 @@ function showAuthMsg(type, text) {
 
 let _shareNewsId   = null;   // id ของข่าวที่กำลัง share
 let _shareTitle    = '';
-let _shareUrl      = '';     // TCC deep-link เสมอ
-let _shareOrigUrl  = '';     // URL ต้นฉบับ (RSS) — ไม่ใช้ใน v37 (ไม่แนบ text เพิ่มเติม)
+let _shareUrl      = '';     // GitHub Pages URL — แสดงใน input + copy
+let _ogProxyUrl    = '';     // GAS ogProxy URL — ส่งให้ bot เฉพาะตอนกดปุ่ม platform
+let _shareOrigUrl  = '';     // URL ต้นฉบับ (RSS) — ไม่ใช้ใน v37
 let _shareImageUrl = '';     // image_url ของข่าว
 let _detailNewsId  = null;   // id ของข่าวที่กำลังแสดง detail
 
-// ── Build TCC deep-link URL ──
+// ── Build TCC deep-link URL (GitHub Pages) ──
 function buildShareURL(newsId) {
   const base = window.location.origin + window.location.pathname;
   return base + '?news=' + encodeURIComponent(newsId);
@@ -2780,24 +2781,27 @@ function buildSocialShareURL(newsId) {
   return buildShareURL(newsId);
 }
 
-// ── Open Share Modal (v37) ──
-// newsId   : id ของข่าว
-// title    : หัวข่าว
-// origUrl  : URL ต้นฉบับ (ถ้า RSS) — ไม่ใช้แนบ text อีกต่อไป (v37)
-// imageUrl : image_url ของข่าว
+// ── Open Share Modal (v38) ──
+// _shareUrl    = GitHub Pages URL → แสดงใน input + copy → ผู้ใช้เห็น URL จริง
+// _ogProxyUrl  = GAS ogProxy URL → ส่งให้ bot เฉพาะตอนกดปุ่ม platform → preview ถูกต้อง
 function openShareModal(newsId, title, origUrl, imageUrl) {
   _shareNewsId   = newsId;
   _shareTitle    = title;
   _shareImageUrl = imageUrl || '';
 
-  // ── URL สำหรับ copy (Workers URL — ผู้ใช้ copy แล้ว bot preview ถูกต้อง) ──
-  _shareUrl = buildSocialShareURL(newsId);
+  // URL แสดงใน input = GitHub Pages URL เสมอ (ผู้ใช้เห็น URL จริง)
+  _shareUrl    = buildShareURL(newsId);
+
+  // URL สำหรับ bot = GAS ogProxy (bot fetch → อ่าน OG tags → preview ถูกต้อง)
+  _ogProxyUrl  = (GAS_URL && GAS_URL !== 'YOUR_GAS_WEB_APP_URL_HERE')
+    ? GAS_URL + '?action=ogProxy&id=' + encodeURIComponent(newsId)
+    : _shareUrl; // fallback: ถ้าไม่มี GAS → ใช้ GitHub Pages (preview อาจไม่มีรูป)
 
   // ── อัปเดต modal ──
   document.getElementById('share-headline').textContent = title;
-  document.getElementById('share-url-input').value      = _shareUrl;
+  document.getElementById('share-url-input').value      = _shareUrl; // แสดง GitHub Pages URL
 
-  // ── แสดงรูปข่าวในหน้าต่างแชร์ (ถ้ามี) ──
+  // ── แสดงรูปข่าวในหน้าต่างแชร์ ──
   _renderShareImage(_shareImageUrl);
 
   const copyBtn = document.getElementById('btn-copy');
@@ -2865,25 +2869,26 @@ async function copyShareLink() {
 // ผู้ใช้คลิก → Workers/GAS redirect ไป SPA ทันที
 
 function shareToFacebook() {
-  const u = encodeURIComponent(_shareUrl);
+  // ส่ง ogProxy URL → Facebook bot fetch → อ่าน OG image ของข่าว → preview ถูกต้อง
+  const u = encodeURIComponent(_ogProxyUrl);
   window.open('https://www.facebook.com/sharer/sharer.php?u=' + u, '_blank', 'width=600,height=400,noopener');
 }
 
 function shareToTwitter() {
-  // X/Twitter: หัวข่าว + URL (Twitter card อ่าน OG จาก Workers)
-  const text = encodeURIComponent(_shareTitle + '\n\n' + _shareUrl);
+  // X/Twitter: ส่ง ogProxy URL → Twitter card อ่าน OG image ของข่าว
+  const text = encodeURIComponent(_shareTitle + '\n\n' + _ogProxyUrl);
   window.open('https://twitter.com/intent/tweet?text=' + text, '_blank', 'width=600,height=400,noopener');
 }
 
 function shareToLine() {
-  // LINE: url param เดียว → LINE bot อ่าน OG preview ได้
-  const u = encodeURIComponent(_shareUrl);
+  // LINE: ส่ง ogProxy URL → LINE bot fetch → OG image ของข่าว → preview ถูกต้อง
+  const u = encodeURIComponent(_ogProxyUrl);
   window.open('https://social-plugins.line.me/lineit/share?url=' + u, '_blank', 'width=600,height=400,noopener');
 }
 
 function shareToTelegram() {
-  // Telegram: url param เดียว → Telegram bot fetch Workers → OG preview ถูกต้อง
-  const u = encodeURIComponent(_shareUrl);
+  // Telegram: ส่ง ogProxy URL → Telegram bot fetch → OG image ของข่าว → preview ถูกต้อง
+  const u = encodeURIComponent(_ogProxyUrl);
   window.open('https://t.me/share/url?url=' + u, '_blank', 'width=600,height=500,noopener');
 }
 
