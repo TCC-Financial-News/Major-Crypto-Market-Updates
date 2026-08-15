@@ -2881,15 +2881,19 @@ function shareToTwitter() {
 }
 
 function shareToLine() {
-  // LINE: ส่ง ogProxy URL → LINE bot fetch → OG image ของข่าว → preview ถูกต้อง
-  const u = encodeURIComponent(_ogProxyUrl);
-  window.open('https://social-plugins.line.me/lineit/share?url=' + u, '_blank', 'width=600,height=400,noopener');
+  // LINE share: url= → LINE bot fetch ogProxy → OG preview ถูกต้อง
+  // text= → ข้อความใน chat = GitHub Pages URL (ผู้ใช้เห็น URL จริง)
+  const u    = encodeURIComponent(_ogProxyUrl);
+  const text = encodeURIComponent(_shareUrl);
+  window.open('https://social-plugins.line.me/lineit/share?url=' + u + '&text=' + text, '_blank', 'width=600,height=400,noopener');
 }
 
 function shareToTelegram() {
-  // Telegram: ส่ง ogProxy URL → Telegram bot fetch → OG image ของข่าว → preview ถูกต้อง
-  const u = encodeURIComponent(_ogProxyUrl);
-  window.open('https://t.me/share/url?url=' + u, '_blank', 'width=600,height=500,noopener');
+  // Telegram share: url= คือ URL ที่ Telegram bot fetch เพื่อสร้าง preview (ต้องเป็น ogProxy)
+  // text= คือข้อความที่แนบมาใน chat → ใส่ GitHub Pages URL เพื่อให้ผู้ใช้เห็น URL จริง
+  const u    = encodeURIComponent(_ogProxyUrl);   // bot fetch → OG image ของข่าว
+  const text = encodeURIComponent(_shareUrl);      // ข้อความใน chat = GitHub Pages URL
+  window.open('https://t.me/share/url?url=' + u + '&text=' + text, '_blank', 'width=600,height=500,noopener');
 }
 
 // ── Share button HTML snippet ──
