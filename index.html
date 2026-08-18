@@ -1320,9 +1320,11 @@ const IS_LOCAL_FILE = window.location.protocol === 'file:';
       <h2>TCC Financial Reports Headlines</h2>
       <p>ข่าว Crypto สำคัญและแนวคิดประจำวัน ส่งตรงถึงกล่องข้อความของคุณทุกเช้า</p>
       <div class="nl-form">
+        <input class="nl-input" type="text"  id="nl-name"  placeholder="ชื่อของคุณ (ไม่บังคับ)" style="flex-basis:100%"/>
         <input class="nl-input" type="email" id="nl-email" placeholder="อีเมลของคุณ"/>
-        <button class="nl-btn" onclick="subscribeNewsletter()">สมัครรับข่าวสาร</button>
+        <button class="nl-btn" id="nl-btn" onclick="subscribeNewsletter()">สมัครรับข่าวสาร</button>
       </div>
+      <div id="nl-msg" style="margin-top:10px;font-size:13px;display:none"></div>
       <p class="nl-note">การสมัครรับข่าวสาร แสดงว่าคุณยอมรับ <a href="#" style="color:var(--tcc-gold)">ข้อกำหนดการใช้งาน</a> และ <a href="#" style="color:var(--tcc-gold)">นโยบายความเป็นส่วนตัว</a></p>
     </div>
   </div>
@@ -2625,13 +2627,54 @@ document.getElementById('filter-tabs').addEventListener('click', e => {
 });
 
 // ──────────────────────────────────────────────
-//  NEWSLETTER
+//  NEWSLETTER (v29 — เชื่อม GAS จริง)
 // ──────────────────────────────────────────────
-function subscribeNewsletter() {
-  const email = document.getElementById('nl-email').value.trim();
-  if (!email || !email.includes('@')) { alert('กรุณาระบุอีเมลที่ถูกต้อง'); return; }
-  alert(`✅ สมัครรับข่าวสารสำเร็จ!\n\nอีเมล: ${email}\nเราจะส่งข่าว Crypto ให้ทุกเช้า`);
-  document.getElementById('nl-email').value = '';
+async function subscribeNewsletter() {
+  const emailEl = document.getElementById('nl-email');
+  const nameEl  = document.getElementById('nl-name');
+  const msgEl   = document.getElementById('nl-msg');
+  const btn     = document.getElementById('nl-btn');
+
+  const email = emailEl.value.trim();
+  const name  = nameEl  ? nameEl.value.trim() : '';
+
+  // Validate
+  if (!email || !email.includes('@')) {
+    _nlMsg('error', '⚠️ กรุณาระบุอีเมลที่ถูกต้อง');
+    return;
+  }
+
+  // Loading state
+  btn.disabled    = true;
+  btn.textContent = 'กำลังดำเนินการ...';
+  _nlMsg('info', '⏳ กำลังส่งข้อมูล...');
+
+  try {
+    const res = await fetchGAS('subscribe', { email, name });
+    if (res && res.success) {
+      _nlMsg('success', '✅ ' + (res.message || 'สมัครรับข่าวสารสำเร็จ! กรุณาตรวจสอบอีเมลของคุณ'));
+      emailEl.value = '';
+      if (nameEl) nameEl.value = '';
+      btn.textContent = '✓ สมัครแล้ว';
+    } else {
+      _nlMsg('error', '❌ ' + (res?.message || 'เกิดข้อผิดพลาด กรุณาลองใหม่'));
+      btn.disabled    = false;
+      btn.textContent = 'สมัครรับข่าวสาร';
+    }
+  } catch(e) {
+    _nlMsg('error', '❌ เกิดข้อผิดพลาด กรุณาลองใหม่');
+    btn.disabled    = false;
+    btn.textContent = 'สมัครรับข่าวสาร';
+  }
+}
+
+function _nlMsg(type, text) {
+  const el = document.getElementById('nl-msg');
+  if (!el) return;
+  const colors = { success: '#16a34a', error: '#dc2626', info: '#888' };
+  el.style.color   = colors[type] || '#444';
+  el.style.display = 'block';
+  el.textContent   = text;
 }
 
 // ──────────────────────────────────────────────
