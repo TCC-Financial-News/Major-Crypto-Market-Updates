@@ -2863,34 +2863,31 @@ async function copyShareLink() {
   setTimeout(() => { btn.textContent = 'คัดลอก'; btn.classList.remove('copied'); }, 2200);
 }
 
-// ── Social Share (v37) ──
-// ส่งแค่ URL เดียว (Workers/ogProxy) — ไม่มี text เพิ่มเติม
-// Bot (Telegram/LINE/Facebook) fetch URL → อ่าน OG tags → preview ถูกต้อง (รูปจริง+หัวข่าวจริง)
-// ผู้ใช้คลิก → Workers/GAS redirect ไป SPA ทันที
+// ── Social Share ──
+// ส่ง _shareUrl (GitHub Pages URL) ให้ทุก platform เสมอ
+// → ผู้ใช้เห็น URL ที่ถูกต้องใน chat และคลิกไปยังเว็บได้โดยตรง
+// OG preview: GitHub Pages ฝัง meta OG ไว้ใน <head> อยู่แล้ว
+//             สำหรับ preview รูปข่าวจริง ต้อง update OG ผ่าน GAS ogProxy ฝั่ง server
 
 function shareToFacebook() {
-  // ส่ง ogProxy URL → Facebook bot fetch → อ่าน OG image ของข่าว → preview ถูกต้อง
-  const u = encodeURIComponent(_ogProxyUrl);
+  const u = encodeURIComponent(_shareUrl);
   window.open('https://www.facebook.com/sharer/sharer.php?u=' + u, '_blank', 'width=600,height=400,noopener');
 }
 
 function shareToTwitter() {
-  // X/Twitter: ส่ง ogProxy URL → Twitter card อ่าน OG image ของข่าว
-  const text = encodeURIComponent(_shareTitle + '\n\n' + _ogProxyUrl);
+  const text = encodeURIComponent(_shareTitle + '\n\n' + _shareUrl);
   window.open('https://twitter.com/intent/tweet?text=' + text, '_blank', 'width=600,height=400,noopener');
 }
 
 function shareToLine() {
-  // LINE share: url= → LINE bot fetch ogProxy → OG preview ถูกต้อง
-  // ไม่ส่ง text= เพิ่มเติม — LINE จะแสดงแค่ preview card จาก ogProxy (ไม่มี URL ซ้ำใน chat)
-  const u = encodeURIComponent(_ogProxyUrl);
+  const u = encodeURIComponent(_shareUrl);
   window.open('https://social-plugins.line.me/lineit/share?url=' + u, '_blank', 'width=600,height=400,noopener');
 }
 
 function shareToTelegram() {
-  // Telegram share: url= คือ URL ที่ Telegram bot fetch เพื่อสร้าง preview (ต้องเป็น ogProxy)
-  // ไม่ส่ง text= เพิ่มเติม — Telegram จะแสดงแค่ preview card จาก ogProxy (ไม่มี URL ซ้ำใน chat)
-  const u = encodeURIComponent(_ogProxyUrl);   // bot fetch → OG image ของข่าว
+  // url= ต้องเป็น GitHub Pages URL — Telegram แสดง URL นี้ตรงๆ ใน chat
+  // ถ้าใส่ ogProxy URL → ผู้ใช้จะเห็น script.google.com ใน chat แทน
+  const u = encodeURIComponent(_shareUrl);
   window.open('https://t.me/share/url?url=' + u, '_blank', 'width=600,height=500,noopener');
 }
 
