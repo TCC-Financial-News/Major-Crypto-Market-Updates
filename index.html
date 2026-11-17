@@ -1655,15 +1655,32 @@ function newsTitle(n) {
   return pick('title_' + currentLang) || pick('title_en') || pick('title_th') || '';
 }
 
-// คำอธิบายใต้หัวข่าว: body_th (ข่าว TCC) → summary (ข่าว RSS) → title_en ถ้าไม่ซ้ำกับหัวข่าวที่แสดงอยู่
-function newsExcerpt(n) {
-  if (!n) return '';
-  const body = (n.body_th == null ? '' : String(n.body_th)).trim();
-  if (body) return body;
-  const sum = (n.summary == null ? '' : String(n.summary)).trim();
-  if (sum) return sum;
+// v39: เนื้อหา/คำอธิบายใต้หัวข่าว ตามภาษาที่เลือก
+//   ลำดับ: body_<lang> (ข่าว TCC) → summary_<lang> (ข่าว RSS) → body_en → summary (ต้นฉบับ en) → body_th → title_en (ถ้าไม่ซ้ำหัวข่าว)
+//   ข่าวเก่าที่ยังไม่ถูกแปล (คอลัมน์ว่าง) จะ fallback ไปต้นฉบับอัตโนมัติ
+//   isBody = true เมื่อมาจากคอลัมน์ body_* (HTML ที่ admin เขียน — แสดงแบบเดิม) | false = ข้อความล้วน ต้อง escape
+function newsExcerptInfo(n) {
+  if (!n) return { text: '', isBody: false };
+  const L = currentLang;
+  const keys = ['body_' + L, 'summary_' + L, 'body_en', 'summary', 'body_th'];
+  for (const k of keys) {
+    const v = (n[k] == null ? '' : String(n[k]).trim());
+    if (v) return { text: v, isBody: k.indexOf('body_') === 0 };
+  }
   const en = (n.title_en == null ? '' : String(n.title_en)).trim();
-  return (en && en !== newsTitle(n)) ? en : '';
+  return { text: (en && en !== newsTitle(n)) ? en : '', isBody: false };
+}
+function newsExcerpt(n) { return newsExcerptInfo(n).text; }
+
+// เรนเดอร์เนื้อหาในหน้า detail (เรียกตอนเปิดข่าว และตอนสลับภาษาขณะเปิดข่าวอยู่)
+function renderDetailBody(n) {
+  const el = document.getElementById('nd-body');
+  if (!el || !n) return;
+  const info = newsExcerptInfo(n);
+  const body = info.isBody ? info.text : escHtml(info.text);
+  el.innerHTML = body
+    ? `<p>${body.replace(/\n/g, '</p><p>')}</p>`
+    : `<p style="color:var(--gray-400)">คลิก "อ่านต่อ" เพื่อดูเนื้อหาฉบับเต็มที่แหล่งข่าว</p>`;
 }
 
 function detectInitialLang() {
@@ -1723,6 +1740,7 @@ function applyLang(code, rerender) {
   if (_detailNewsId && _detailNewsObj) {
     const t = document.getElementById('nd-title');
     if (t) t.textContent = newsTitle(_detailNewsObj);
+    renderDetailBody(_detailNewsObj);   // v39: เนื้อหาในหน้า detail เปลี่ยนตามภาษาด้วย
   }
 }
 
@@ -3251,11 +3269,8 @@ function _renderNewsDetail(n) {
   document.getElementById('nd-tags').innerHTML =
     (n.asset_tags || []).map(t => `<span class="asset-tag">${t}</span>`).join('');
 
-  // body_th ถ้ามี (ข่าว TCC) -> summary (ข่าว RSS) -> title_en ถ้าต่างจากหัวข่าวที่แสดง
-  const body = n.body_th ? n.body_th : escHtml(newsExcerpt(n));
-  document.getElementById('nd-body').innerHTML = body
-    ? `<p>${body.replace(/\n/g, '</p><p>')}</p>`
-    : `<p style="color:var(--gray-400)">คลิก "อ่านต่อ" เพื่อดูเนื้อหาฉบับเต็มที่แหล่งข่าว</p>`;
+  // v39: เนื้อหาตามภาษา (body_<lang> / summary_<lang> → fallback ต้นฉบับ)
+  renderDetailBody(n);
 
   const readMoreEl = document.getElementById('nd-readmore');
   if (n.url && n.url !== '#') {
