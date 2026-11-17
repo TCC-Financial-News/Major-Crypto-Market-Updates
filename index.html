@@ -1737,6 +1737,8 @@ function applyLang(code, rerender) {
   if (allNews.length) renderAll();
   if (allTCCNews.length) renderTCCNews();
   updateAlertBar();
+  // v39: list ส่งมาเฉพาะภาษาที่ขอ → สลับภาษาแล้วโหลดชุดของภาษาใหม่ (แสดงแคชของภาษานั้นทันทีถ้าเคยเปิด)
+  fetchTCCNews(false); fetchNews(false);
   if (_detailNewsId && _detailNewsObj) {
     const t = document.getElementById('nd-title');
     if (t) t.textContent = newsTitle(_detailNewsObj);
@@ -1809,12 +1811,64 @@ document.addEventListener('click', e => {
   if (id) trackView(id);
 }, true);
 
+// ──────────────────────────────────────────────
+//  v39: แคชข้อมูลในเครื่อง (stale-while-revalidate)
+//  รีเฟรช → แสดงข้อมูลล่าสุดที่เคยโหลดทันที แล้วค่อยดึงใหม่เบื้องหลัง อัปเดตเฉพาะเมื่อข้อมูลเปลี่ยนจริง
+//  ถ้าโหลดใหม่ล้มเหลว/ว่าง → คงข้อมูลแคชไว้ ไม่เขียนทับด้วยค่าว่าง
+// ──────────────────────────────────────────────
+const LS_PREFIX = 'tcc_cache_v2_';
+const _hydrated = {};
+function lsGet(k) {
+  try { const o = JSON.parse(localStorage.getItem(LS_PREFIX + k)); return (o && o.d != null) ? o : null; }
+  catch (e) { return null; }
+}
+function lsSet(k, d) {
+  const val = JSON.stringify({ t: Date.now(), d: d });
+  try { localStorage.setItem(LS_PREFIX + k, val); }
+  catch (e) {   // เต็ม → ล้างแคชของเรา (ยกเว้น key นี้) แล้วลองอีกครั้ง
+    try {
+      Object.keys(localStorage).filter(x => x.indexOf(LS_PREFIX) === 0 && x !== LS_PREFIX + k).forEach(x => localStorage.removeItem(x));
+      localStorage.setItem(LS_PREFIX + k, val);
+    } catch (_) {}
+  }
+}
+// key, action, params, apply(data, {cached, same}), opts { force, freshMs, valid(data) }
+async function swrLoad(key, action, params, apply, opts) {
+  opts = opts || {};
+  const c = lsGet(key);
+  if (c && (!_hydrated[key] || (opts.stale && opts.stale()))) {   // แสดงแคชทันที (ยังไม่เคยแสดง หรือข้อมูลบนจอเป็นของภาษาอื่น)
+    _hydrated[key] = true;
+    try { apply(c.d, { cached: true, same: false }); } catch (e) { console.warn('[cache] apply failed', e); }
+  }
+  if (c && !opts.force && opts.freshMs && (Date.now() - c.t) < opts.freshMs) return c.d;   // ยังสดอยู่ ไม่ต้องยิง GAS
+  const data = await fetchGAS(action, params);
+  const ok = opts.valid ? opts.valid(data) : true;
+  if (!ok) return c ? c.d : data;                // GAS ล้มเหลว/ว่าง → ใช้แคชต่อ
+  const same = !!c && JSON.stringify(c.d) === JSON.stringify(data);
+  lsSet(key, data);
+  _hydrated[key] = true;
+  apply(data, { cached: false, same: same });
+  return data;
+}
+// สลับภาษา/โหลดข่าวใหม่ขณะเปิดหน้า detail → อัปเดต object ที่เปิดอยู่ให้ได้เนื้อหาของภาษาล่าสุด
+function syncDetailFromLists() {
+  if (!_detailNewsId) return;
+  const fresh = [...(allTCCNews || []), ...(allNews || [])].find(n => n.id === _detailNewsId);
+  if (!fresh) return;
+  _detailNewsObj = fresh;
+  const t = document.getElementById('nd-title');
+  if (t) t.textContent = newsTitle(fresh);
+  renderDetailBody(fresh);
+}
+
 async function fetchMostRead() {
   try {
-    const data = await fetchGAS('mostread', { days: 7, limit: 10 });
-    _mostRead = (data && Array.isArray(data.items)) ? data.items : [];
-  } catch (e) { _mostRead = []; }
-  renderMostRead(getFilteredNews());
+    await swrLoad('mostread', 'mostread', { days: 7, limit: 10 }, (data) => {
+      _mostRead = (data && Array.isArray(data.items)) ? data.items : [];
+      renderMostRead(getFilteredNews());
+    }, { valid: d => d && Array.isArray(d.items) && d.items.length > 0 });
+    renderMostRead(getFilteredNews());
+  } catch (e) { _mostRead = []; renderMostRead(getFilteredNews()); }
 }
 
 function getFilteredNews() {
@@ -1826,28 +1880,60 @@ function getFilteredNews() {
 // ──────────────────────────────────────────────
 //  INIT
 // ──────────────────────────────────────────────
+// v39: วาดหน้าจากแคชทันที (ก่อนรอ GAS) ถ้ามี
+function hydrateFromCache() {
+  try {
+    const pr = lsGet('prices');
+    if (pr && Array.isArray(pr.d) && pr.d.length) { allPrices = pr.d; renderPrices(); renderTicker(); }
+    const t = lsGet('tccnews_' + currentLang);
+    if (t && t.d && Array.isArray(t.d.tccnews) && t.d.tccnews.length) { _hydrated['tccnews_' + currentLang] = true; allTCCNews = t.d.tccnews; _tccLoadedLang = currentLang; renderTCCNews(); }
+    const n = lsGet('news_' + currentLang);
+    if (n && n.d && Array.isArray(n.d.news) && n.d.news.length) {
+      _hydrated['news_' + currentLang] = true;
+      allNews = n.d.news;
+      _newsLoadedLang = currentLang;
+      allNews.forEach(x => { if (x.url && x.url !== '#') _urlToId[x.url] = x.id; });
+      renderAll();
+      updateAlertBar();
+      setStatus('live', 'แสดงข้อมูลล่าสุด · กำลังอัปเดต...');
+    }
+    const ev = lsGet('events');
+    if (ev && ev.d && Array.isArray(ev.d.events) && ev.d.events.length) { _hydrated['events'] = true; renderEvents(ev.d.events); }
+    const mr = lsGet('mostread');
+    if (mr && mr.d && Array.isArray(mr.d.items)) { _hydrated['mostread'] = true; _mostRead = mr.d.items; renderMostRead(getFilteredNews()); }
+  } catch (e) { console.warn('[cache] hydrate failed', e); }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   initLang();   // v38: ตั้งภาษาก่อน render ครั้งแรก (บัญชี → localStorage → ?lang= → เบราว์เซอร์ → th)
-  refreshAll().then(() => checkDeepLink());
+  hydrateFromCache();   // v39: แสดงข้อมูลเดิมทันที
+  refreshAll(false).then(() => checkDeepLink());   // false = ถ้าแคชยังสด (<2 นาที) ไม่ต้องยิง GAS ซ้ำ
   // Auto refresh:
   // prices   ทุก 2 นาที   (GAS Sheet อัปเดตทุก 10 นาที -- 2 min poll เพียงพอ)
   // news     ทุก 30 นาที  (v28.1: sync กับ GAS trigger fetchAllNews ทุก 30 นาที -- เดิม 5 นาที เปลืองโควต้าโดยเปล่าประโยชน์)
   // tccnews  ทุก 10 นาที  (v28.1: admin โพสต์เองไม่บ่อย -- เดิม 3 นาที)
   setInterval(fetchPrices,   2 * 60000);
-  setInterval(fetchNews,    30 * 60000);
-  setInterval(fetchTCCNews, 10 * 60000);
+  setInterval(() => fetchNews(true),    30 * 60000);
+  setInterval(() => fetchTCCNews(true), 10 * 60000);
   setInterval(fetchMostRead, 10 * 60000);   // v38: GAS แคช mostread 5 นาที
 });
 
-async function refreshAll() {
-  setStatus('loading', 'กำลังโหลดข้อมูล...');
-  // Sequential fetch — ป้องกัน browser abort 4 concurrent requests ไปยัง GAS เดียวกัน
-  // prices สำคัญสุด ดึงก่อน ส่วน news ใช้เวลานานสุด (50 rows)
-  await fetchPrices();
-  await fetchTCCNews();
-  await fetchEvents();
-  await fetchNews();   // news สุดท้าย — ใหญ่สุด แต่ไม่บล็อก prices/events
-  await fetchMostRead();   // v38: ยอดอ่านจริง (ต้องหลัง fetchNews เพื่อจับคู่ id กับข่าว)
+// force: true = ปุ่มรีเฟรช (ดึงใหม่เสมอ) | false = เปิดหน้า (ใช้แคชที่ยังสดได้)
+// v39: แบ่ง 2 สาย ทำงานพร้อมกัน (ไม่เกิน 2 request ต่อ GAS ในเวลาเดียวกัน): ข่าว | ราคา+อีเวนต์
+async function refreshAll(force = true) {
+  if (force === undefined || force === null || typeof force === 'object') force = true;   // onclick ส่ง event มา
+  if (!allNews.length) setStatus('loading', 'กำลังโหลดข้อมูล...');
+  await Promise.all([
+    (async () => {
+      await fetchTCCNews(force);
+      await fetchNews(force);
+      await fetchMostRead();   // ต้องหลัง fetchNews เพื่อจับคู่ id กับข่าว
+    })(),
+    (async () => {
+      await fetchPrices();
+      await fetchEvents(force);
+    })(),
+  ]);
 }
 
 // ──────────────────────────────────────────────
@@ -1872,6 +1958,7 @@ function setStatus(state, text) {
 // ──────────────────────────────────────────────
 // -- GAS dead-URL cache: ถ้า 404 ครั้งแรกให้ flag ไว้ ไม่ retry ทุก action ซ้ำ
 let _gasIs404 = false;
+let _newsLoadedLang = '', _tccLoadedLang = '';   // v39: ภาษาของข้อมูลที่อยู่บนจอ (กัน render ข้ามเมื่อสลับภาษา)
 
 async function fetchGAS(action, params = {}) {
   // -- DEMO / LOCAL MODE --
@@ -2011,35 +2098,49 @@ function getMockData(action) {
 // ──────────────────────────────────────────────
 //  FETCH NEWS
 // ──────────────────────────────────────────────
-async function fetchNews() {
+async function fetchNews(force = true) {
+  const lang = currentLang;
   try {
-    const data = await fetchGAS('news', { limit: 100 }); // v28.1: เพิ่มจาก 50 ให้ตรงกับ GAS default
-    allNews = data.news || [];
-    allNews.forEach(n => { if (n.url && n.url !== '#') _urlToId[n.url] = n.id; });   // v38: map url -> id สำหรับนับยอดอ่าน
-    console.log('[TCCReport] fetchNews got', allNews.length, 'items');
-    renderAll();
-    if (!IS_LOCAL_FILE) {
-      if (allNews.length === 0) {
-        setStatus('error', 'ไม่มีข้อมูลข่าว — Sheet News อาจว่างเปล่า');
-      } else {
-        setStatus('live', `อัปเดตล่าสุด: ${formatTime(new Date())}`);
-      }
+    // v39: ขอเฉพาะเนื้อหาของภาษาที่เลือก (ลดขนาดข้อมูล) + แคชแยกตามภาษา
+    const data = await swrLoad('news_' + lang, 'news', { limit: 100, lang: lang }, (d, info) => {
+      if (lang !== currentLang) return;            // ผู้ใช้สลับภาษาระหว่างรอ → ทิ้งผลของภาษาเก่า
+      if (info.same && allNews.length && _newsLoadedLang === lang) return;   // ข้อมูลเหมือนเดิม ไม่ต้อง render ซ้ำ
+      allNews = d.news || [];
+      _newsLoadedLang = lang;
+      allNews.forEach(n => { if (n.url && n.url !== '#') _urlToId[n.url] = n.id; });   // v38: map url -> id สำหรับนับยอดอ่าน
+      console.log('[TCCReport] fetchNews got', allNews.length, 'items', info.cached ? '(cache)' : '');
+      renderAll();
+      updateAlertBar();
+      syncDetailFromLists();
+    }, { force: force, freshMs: 120000, stale: () => _newsLoadedLang !== lang, valid: d => d && Array.isArray(d.news) && d.news.length > 0 });
+    updateNewsStatus();
+    if (!allNews.length && data && Array.isArray(data.news) && !IS_LOCAL_FILE) {
+      setStatus('error', 'ไม่มีข้อมูลข่าว — Sheet News อาจว่างเปล่า');
     }
-    updateAlertBar();
   } catch (e) {
     if (!IS_LOCAL_FILE) setStatus('error', 'โหลดข้อมูลไม่สำเร็จ — ' + e.message);
     console.error('fetchNews error:', e);
   }
 }
+function updateNewsStatus() {
+  if (!IS_LOCAL_FILE && allNews.length) setStatus('live', `อัปเดตล่าสุด: ${formatTime(new Date())}`);
+}
 
 // ──────────────────────────────────────────────
 //  FETCH TCC NEWS (ข่าวประกาศจาก TCC เอง)
 // ──────────────────────────────────────────────
-async function fetchTCCNews() {
+async function fetchTCCNews(force = true) {
+  const lang = currentLang;
   try {
-    const data = await fetchGAS('tccnews', { limit: 20 });
-    allTCCNews = data.tccnews || [];
-    renderTCCNews();
+    await swrLoad('tccnews_' + lang, 'tccnews', { limit: 20, lang: lang }, (d, info) => {
+      if (lang !== currentLang) return;
+      if (info.same && allTCCNews.length && _tccLoadedLang === lang) return;
+      allTCCNews = d.tccnews || [];
+      _tccLoadedLang = lang;
+      renderTCCNews();
+      syncDetailFromLists();
+    }, { force: force, freshMs: 120000, stale: () => _tccLoadedLang !== lang, valid: d => d && Array.isArray(d.tccnews) && d.tccnews.length > 0 });
+    if (!allTCCNews.length) renderTCCNews();   // ไม่มีข่าว TCC → แสดง empty state เหมือนเดิม
   } catch (e) {
     console.error('fetchTCCNews error:', e);
     // ไม่ทำอะไร — renderTCCNews ยังแสดง empty state ได้
@@ -2111,6 +2212,7 @@ async function fetchPrices() {
         console.log('[TCCReport] GAS prices OK --', allPrices.length, 'coins');
         renderPrices();
         renderTicker();
+        lsSet('prices', allPrices);   // v39
         return;
       }
       console.warn('[TCCReport] GAS prices valid=' + validPrices.length + '/' + rawPrices.length + ' (deduped=' + dedupedPrices.length + ') -> fallback Binance');
@@ -2159,10 +2261,12 @@ async function fetchPrices() {
 // ──────────────────────────────────────────────
 //  FETCH EVENTS
 // ──────────────────────────────────────────────
-async function fetchEvents() {
+async function fetchEvents(force = true) {
   try {
-    const data = await fetchGAS('events');
-    if (data.events && data.events.length > 0) renderEvents(data.events);
+    await swrLoad('events', 'events', {}, (d, info) => {
+      if (info.same) return;
+      if (d.events && d.events.length > 0) renderEvents(d.events);
+    }, { force: force, freshMs: 600000, valid: d => d && Array.isArray(d.events) && d.events.length > 0 });
   } catch (e) {
     console.error('fetchEvents error:', e);
   }
