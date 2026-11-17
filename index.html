@@ -32,7 +32,13 @@
                  → ผู้ใช้คลิก → Workers redirect ไป SPA ทันที
                - copyShareLink / share-url-input: แสดง Workers URL (ไม่ใช่ GitHub Pages)
                - เพิ่มปุ่ม Telegram ใน share modal
-               - ลบ _buildSocialText() และ _shareOrigUrl ออก (ไม่ต้องการอีกต่อไป) -->
+               - ลบ _buildSocialText() และ _shareOrigUrl ออก (ไม่ต้องการอีกต่อไป)
+     v38 (GAS v30 + worker_tcc_news_share.js): Multi-language headlines + Share via Worker
+               - ระบบภาษาหัวข่าว 9 ภาษา (th en vi kh mm la ms id zh): newsTitle(n) = ภาษาที่เลือก → en → th
+                 ลำดับ: บัญชี → localStorage → ?lang= → ภาษาเบราว์เซอร์ → th | เก็บ token ตอน login เพื่อ setLang
+               - Share: ลิงก์ = WORKERS_URL/n/<id>?lang=xx (ลบ ogProxy ที่ GAS v30 ไม่มีแล้ว) + Web Share API บนมือถือ
+               - RSS: แสดง summary ใน hero/section/detail | อ่านมากที่สุด = ยอดอ่านจริง (action=view/mostread)
+               - แก้ราคา TCC static ($4.20 -> $0.0850) และเอาอีเวนต์ static ที่ล้าสมัยออก -->
 <meta name="description" content="แหล่งข่าว Crypto ชั้นนำสำหรับนักเทรดทั่วโลก ครอบคลุมตลาด นโยบาย เทคโนโลยี และการเงิน Crypto ระดับโลก"/>
 <meta property="og:title" content="TCC Financial Reports" id="og-title"/>
 <meta property="og:description" content="ข่าว Crypto อัปเดตทุก 30 นาที" id="og-description"/>
@@ -180,6 +186,30 @@ button{cursor:pointer;font-family:inherit}
 .dark-toggle:hover{border-color:var(--black);background:var(--gray-50)}
 [data-theme="dark"] .dark-toggle{border-color:#444;background:#1a1a1a}
 [data-theme="dark"] .dark-toggle:hover{border-color:#666;background:#242424}
+/* ─── LANGUAGE SWITCHER (v38) — ภาษาของ "หัวข่าว" ─── */
+.lang-sw{position:relative;margin-left:8px;flex-shrink:0}
+.lang-btn{display:flex;align-items:center;gap:5px;height:32px;padding:0 10px;font-size:12px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--text-primary,#1a1a1a);background:none;border:1.5px solid var(--gray-200);border-radius:16px;cursor:pointer;transition:border-color .15s,background .15s}
+.lang-btn:hover{border-color:var(--black);background:var(--gray-50)}
+.lang-caret{font-size:8px;color:var(--gray-400)}
+.lang-menu{display:none;position:absolute;top:calc(100% + 6px);right:0;min-width:190px;background:var(--bg-card,#fff);border:1px solid var(--gray-200);border-top:2px solid var(--tcc-red);border-radius:4px;z-index:1200;box-shadow:0 8px 24px rgba(0,0,0,.12);max-height:70vh;overflow-y:auto}
+.lang-sw.open .lang-menu{display:block}
+.lang-opt{display:flex;align-items:center;gap:10px;width:100%;padding:9px 14px;font-size:13px;font-family:inherit;color:var(--gray-800);background:none;border:none;border-bottom:1px solid var(--gray-100);cursor:pointer;text-align:left}
+.lang-opt:last-child{border-bottom:none}
+.lang-opt:hover{background:var(--gray-50)}
+.lang-opt.active{font-weight:700;color:var(--black)}
+.lang-code{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;color:var(--gray-400);min-width:22px}
+.lang-check{margin-left:auto;color:var(--tcc-red);font-size:12px;visibility:hidden}
+.lang-opt.active .lang-check{visibility:visible}
+.drawer-lang{padding:12px 16px;border-top:1px solid var(--gray-100)}
+.drawer-lang-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.drawer-lang-btn{padding:8px 4px;font-size:12px;font-weight:600;font-family:inherit;color:var(--gray-800);background:var(--gray-50);border:1.5px solid var(--gray-200);border-radius:6px;cursor:pointer;line-height:1.3;min-width:0}
+.drawer-lang-btn.active{border-color:var(--black);color:var(--black);background:var(--bg-card,#fff);font-weight:700}
+/* ฟอนต์ตามภาษา — Noto Khmer/Myanmar/Lao โหลดเมื่อเลือกภาษานั้นเท่านั้น (loadLangFont) */
+html[lang="km"] body,html[lang="km"] button,html[lang="km"] input{font-family:'Noto Sans Khmer','IBM Plex Sans Thai','DM Sans',sans-serif}
+html[lang="my"] body,html[lang="my"] button,html[lang="my"] input{font-family:'Noto Sans Myanmar','IBM Plex Sans Thai','DM Sans',sans-serif}
+html[lang="lo"] body,html[lang="lo"] button,html[lang="lo"] input{font-family:'Noto Sans Lao','IBM Plex Sans Thai','DM Sans',sans-serif}
+html[lang="zh-CN"] body,html[lang="zh-CN"] button,html[lang="zh-CN"] input{font-family:'IBM Plex Sans Thai','DM Sans','PingFang SC','Noto Sans SC','Microsoft YaHei',sans-serif}
+
 
 /* ─── SKELETON LOADER ─── */
 .skel{background:linear-gradient(90deg,#e8e8e8 25%,#f5f5f5 50%,#e8e8e8 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:3px}
@@ -550,6 +580,8 @@ footer{background:#111;color:#ccc;padding:48px 0 24px;margin-top:40px}
 .share-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gray-400);margin-bottom:8px}
 .share-headline{font-size:15px;font-weight:700;line-height:1.4;color:var(--black);margin-bottom:20px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .share-copy-row{display:flex;gap:8px;margin-bottom:20px}
+.btn-native-share{display:none;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px;margin:-6px 0 18px;font-size:13px;font-weight:700;font-family:inherit;color:var(--white);background:var(--black);border:none;border-radius:6px;cursor:pointer;transition:opacity .15s}
+.btn-native-share:hover{opacity:.85}
 .share-url-input{flex:1;padding:9px 12px;font-size:12px;font-family:'IBM Plex Mono',monospace;border:1.5px solid var(--gray-200);border-radius:6px;background:var(--gray-50);color:var(--gray-600);outline:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .share-url-input:focus{border-color:var(--black)}
 .btn-copy{padding:9px 14px;font-size:13px;font-weight:700;background:var(--black);color:#fff;border:none;border-radius:6px;cursor:pointer;transition:opacity .15s;white-space:nowrap;font-family:inherit}
@@ -656,6 +688,7 @@ footer{background:#111;color:#ccc;padding:48px 0 24px;margin-top:40px}
   .navbar{width:100%}
   .nav-inner{padding:0 12px;gap:8px;width:100%}
   .nav-links,.nav-right{display:none!important}
+  .lang-sw{display:none}   /* มือถือเลือกภาษาใน drawer แทน */
   .nav-hamburger{display:flex;margin-left:auto;flex-shrink:0}
   .logo{flex:1;min-width:0;margin-right:0}
   .logo-text{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1034,9 +1067,12 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbyCL0DBeRqmgEIwniMWHQoR
 //  URL หลักสำหรับแชร์ทุก platform (Telegram/LINE/Facebook/Twitter)
 //  Workers return HTML+OG tags ถูกต้องต่อข่าว → bot อ่าน OG ได้ (รูปจริง+หัวข่าวจริง)
 //  แล้ว JS redirect ไป SPA ทันที — ผู้ใช้คลิกไม่ติดค้างที่ Workers
-//  ตั้งเป็น '' เพื่อ fallback เป็น GAS ogProxy แทน
+//  v38: ใช้ worker_tcc_news_share.js (wrangler name = tcc-news-share) → ลิงก์แชร์ = <WORKERS_URL>/n/<id>?lang=xx
+//  หลัง deploy Worker ให้ใส่ URL ตรงนี้ เช่น 'https://tcc-news-share.<subdomain>.workers.dev' (ไม่ต้องมี / ท้าย)
+//  ถ้าเว้นว่าง '' → ปุ่มแชร์ fallback เป็นลิงก์ GitHub Pages (?news=id&lang=xx) ซึ่งบอทอ่านได้แค่ OG ของเว็บ ไม่ใช่ของข่าว
+//  (GAS ogProxy ถูกลบใน GAS v30 แล้ว — ใช้ไม่ได้)
 // ─────────────────────────────────────────────
-const WORKERS_URL = ''; // v7: ปิด Workers — ใช้ GAS ogProxy fallback แทน
+const WORKERS_URL = '';
 
 const TCC_TOKEN_PRICE = 0.085;
 
@@ -1100,6 +1136,11 @@ const IS_LOCAL_FILE = window.location.protocol === 'file:';
       <button class="btn-signin" onclick="openModal('login')">เข้าสู่ระบบ</button>
       <button class="btn-signup" onclick="openModal('register')">สมัครสมาชิก</button>
     </div>
+    <!-- Language switcher (v38) — ภาษาหัวข่าว 9 ภาษา (เมนูถูกสร้างโดย renderLangUI) -->
+    <div class="lang-sw" id="lang-sw">
+      <button class="lang-btn" id="lang-btn" type="button" onclick="toggleLangMenu(event)" aria-haspopup="true" aria-label="เลือกภาษาหัวข่าว" title="ภาษาหัวข่าว">🌐 <span id="lang-btn-code">TH</span><span class="lang-caret">▾</span></button>
+      <div class="lang-menu" id="lang-menu"></div>
+    </div>
     <!-- Dark mode toggle (desktop always visible, mobile visible in nav) -->
     <button class="dark-toggle" id="dark-toggle-btn" onclick="toggleDarkMode()" title="สลับโหมดมืด/สว่าง" aria-label="Dark mode toggle" style="margin-left:8px">🌙</button>
     <div class="mob-dark-toggle-wrap" style="display:none"></div>
@@ -1141,6 +1182,11 @@ const IS_LOCAL_FILE = window.location.protocol === 'file:';
       <a class="mobile-nav-link" href="#" onclick="closeDrawer()">วิจัย</a>
       <a class="mobile-nav-link" href="#" onclick="closeDrawer()">อีเวนต์</a>
     </div>
+    <!-- Language picker ใน drawer (v38) -->
+    <div class="drawer-lang">
+      <div class="mobile-nav-section-label" style="padding:0 0 8px">🌐 ภาษาหัวข่าว</div>
+      <div class="drawer-lang-grid" id="drawer-lang-grid"></div>
+    </div>
     <!-- Dark mode toggle ใน drawer -->
     <div style="padding:12px 16px;border-top:1px solid var(--gray-100)">
       <button onclick="toggleDarkMode()" style="display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;background:var(--gray-50);border:1.5px solid var(--gray-200);border-radius:6px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--gray-800)">
@@ -1170,7 +1216,7 @@ const IS_LOCAL_FILE = window.location.protocol === 'file:';
     <div class="tick-item"><span class="tick-name">AVAX</span><span class="tick-price">—</span><span class="tick-chg">—</span></div>
     <div class="tick-item"><span class="tick-name">DOT</span><span class="tick-price">—</span><span class="tick-chg">—</span></div>
     <div class="tick-item"><span class="tick-name">LINK</span><span class="tick-price">—</span><span class="tick-chg">—</span></div>
-    <div class="tick-item"><span class="tick-name">TCC</span><span class="tick-price">$4.20</span><span class="tick-chg up">▲ 0.00%</span></div>
+    <div class="tick-item"><span class="tick-name">TCC</span><span class="tick-price">$0.0850</span><span class="tick-chg up">▲ 0.00%</span></div>
     <div class="tick-item"><span class="tick-name">BTC</span><span class="tick-price">—</span><span class="tick-chg">—</span></div>
     <div class="tick-item"><span class="tick-name">ETH</span><span class="tick-price">—</span><span class="tick-chg">—</span></div>
     <div class="tick-item"><span class="tick-name">BNB</span><span class="tick-price">—</span><span class="tick-chg">—</span></div>
@@ -1181,7 +1227,7 @@ const IS_LOCAL_FILE = window.location.protocol === 'file:';
     <div class="tick-item"><span class="tick-name">AVAX</span><span class="tick-price">—</span><span class="tick-chg">—</span></div>
     <div class="tick-item"><span class="tick-name">DOT</span><span class="tick-price">—</span><span class="tick-chg">—</span></div>
     <div class="tick-item"><span class="tick-name">LINK</span><span class="tick-price">—</span><span class="tick-chg">—</span></div>
-    <div class="tick-item"><span class="tick-name">TCC</span><span class="tick-price">$4.20</span><span class="tick-chg up">▲ 0.00%</span></div>
+    <div class="tick-item"><span class="tick-name">TCC</span><span class="tick-price">$0.0850</span><span class="tick-chg up">▲ 0.00%</span></div>
   </div>
 </div>
 
@@ -1376,15 +1422,8 @@ const IS_LOCAL_FILE = window.location.protocol === 'file:';
   <div style="margin-bottom:24px">
     <div class="sec-header"><span class="sec-title">อีเวนต์ที่กำลังจะมาถึง</span><a href="#" class="sec-more">ดูทั้งหมด →</a></div>
     <div id="events-list">
-      <!-- fallback static -->
-      <div class="event-item">
-        <div class="event-date"><div class="event-month">ส.ค.</div><div class="event-day">20</div></div>
-        <div><a class="event-title" href="#">TCC Crypto Summit Thailand 2026</a><div class="event-loc">📍 กรุงเทพฯ, ไทย</div></div>
-      </div>
-      <div class="event-item">
-        <div class="event-date"><div class="event-month">ก.ย.</div><div class="event-day">05</div></div>
-        <div><a class="event-title" href="#">Consensus Singapore 2026</a><div class="event-loc">📍 สิงคโปร์</div></div>
-      </div>
+      <!-- v38: ลบรายการ static ที่ล้าสมัยแล้ว — อีเวนต์จริงมาจาก Sheet "Events" (renderEvents แทนที่กล่องนี้) -->
+      <div class="empty-state" style="padding:20px 0"><p>ยังไม่มีอีเวนต์ที่กำลังจะมาถึง</p></div>
     </div>
   </div>
 
@@ -1437,6 +1476,7 @@ const IS_LOCAL_FILE = window.location.protocol === 'file:';
       <input class="share-url-input" id="share-url-input" readonly type="text" value=""/>
       <button class="btn-copy" id="btn-copy" onclick="copyShareLink()">คัดลอก</button>
     </div>
+    <button class="btn-native-share" id="btn-native-share" type="button" onclick="shareNative()">📲 แชร์ผ่านแอปในอุปกรณ์</button>
     <div class="share-divider">แชร์ไปยัง</div>
     <div class="share-channels">
       <button class="share-ch tg" onclick="shareToTelegram()">
@@ -1579,9 +1619,197 @@ const MONTHS_TH = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.',
 const CAT_MAP   = { markets:'ตลาด', finance:'การเงิน', policy:'นโยบาย', tech:'เทคโนโลยี', business:'ธุรกิจ' };
 
 // ──────────────────────────────────────────────
+//  v38: LANGUAGE — ภาษาของ "หัวข่าว" เท่านั้น (ส่วนอื่นของหน้ายังเป็นไทย)
+//  code = รหัสใน UI / ชื่อคอลัมน์ Sheet (th en vi kh mm la ms id zh) — ไม่ใช่ ISO ทั้งหมด
+//  iso  = รหัสจริงสำหรับ <html lang> (kh=km, mm=my, la=lo, zh=zh-CN)
+//  ลำดับความสำคัญ: บัญชีสมาชิก → localStorage → ?lang= ในลิงก์ → ภาษาเบราว์เซอร์ → th
+// ──────────────────────────────────────────────
+const LANGS = [
+  { code:'th', iso:'th',    label:'ไทย',               font:'' },
+  { code:'en', iso:'en',    label:'English',           font:'' },
+  { code:'vi', iso:'vi',    label:'Tiếng Việt',        font:'' },
+  { code:'kh', iso:'km',    label:'ខ្មែរ',               font:'Noto+Sans+Khmer' },
+  { code:'mm', iso:'my',    label:'မြန်မာ',              font:'Noto+Sans+Myanmar' },
+  { code:'la', iso:'lo',    label:'ລາວ',               font:'Noto+Sans+Lao' },
+  { code:'ms', iso:'ms',    label:'Bahasa Melayu',     font:'' },
+  { code:'id', iso:'id',    label:'Bahasa Indonesia',  font:'' },
+  { code:'zh', iso:'zh-CN', label:'简体中文',           font:'' },
+];
+const LANG_BY_CODE = Object.fromEntries(LANGS.map(l => [l.code, l]));
+// ภาษาเบราว์เซอร์ (ISO) -> รหัส UI
+const BROWSER_LANG_MAP = { th:'th', en:'en', vi:'vi', km:'kh', my:'mm', lo:'la', ms:'ms', id:'id', in:'id', zh:'zh' };
+let currentLang   = 'th';
+let _detailNewsObj = null;   // ข่าวที่เปิดใน detail modal (ใช้อัปเดตหัวข่าวตอนสลับภาษา)
+
+function _normLang(v) { v = String(v || '').trim().toLowerCase(); return LANG_BY_CODE[v] ? v : ''; }
+
+function escHtml(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function escAttr(s) { return escHtml(s).replace(/"/g, '&quot;'); }
+
+// หัวข่าวตามภาษาที่เลือก → en → th  (จุดเดียวแทน n.title_th || n.title_en เดิมทั้งหมด)
+function newsTitle(n) {
+  if (!n) return '';
+  const pick = k => (n[k] == null ? '' : String(n[k]).trim());
+  return pick('title_' + currentLang) || pick('title_en') || pick('title_th') || '';
+}
+
+// คำอธิบายใต้หัวข่าว: body_th (ข่าว TCC) → summary (ข่าว RSS) → title_en ถ้าไม่ซ้ำกับหัวข่าวที่แสดงอยู่
+function newsExcerpt(n) {
+  if (!n) return '';
+  const body = (n.body_th == null ? '' : String(n.body_th)).trim();
+  if (body) return body;
+  const sum = (n.summary == null ? '' : String(n.summary)).trim();
+  if (sum) return sum;
+  const en = (n.title_en == null ? '' : String(n.title_en)).trim();
+  return (en && en !== newsTitle(n)) ? en : '';
+}
+
+function detectInitialLang() {
+  try { if (currentUser && _normLang(currentUser.lang)) return _normLang(currentUser.lang); } catch (e) {}
+  try { const s = _normLang(localStorage.getItem('tcc_lang')); if (s) return s; } catch (e) {}
+  try { const q = _normLang(new URLSearchParams(location.search).get('lang')); if (q) return q; } catch (e) {}
+  try {
+    const list = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language || ''];
+    for (const l of list) {
+      const m = BROWSER_LANG_MAP[String(l).toLowerCase().split('-')[0]];
+      if (m) return m;
+    }
+  } catch (e) {}
+  return 'th';
+}
+
+// โหลดฟอนต์ Noto Khmer / Myanmar / Lao เฉพาะตอนผู้ใช้เลือกภาษานั้น
+function loadLangFont(code) {
+  const f = LANG_BY_CODE[code] && LANG_BY_CODE[code].font;
+  if (!f) return;
+  const id = 'lang-font-' + code;
+  if (document.getElementById(id)) return;
+  const link = document.createElement('link');
+  link.id = id; link.rel = 'stylesheet';
+  link.href = 'https://fonts.googleapis.com/css2?family=' + f + ':wght@400;600;700&display=swap';
+  document.head.appendChild(link);
+}
+
+function renderLangUI() {
+  const menu = document.getElementById('lang-menu');
+  if (menu) {
+    menu.innerHTML = LANGS.map(l =>
+      `<button type="button" class="lang-opt${l.code === currentLang ? ' active' : ''}" onclick="setLang('${l.code}')">` +
+      `<span class="lang-code">${l.code.toUpperCase()}</span><span>${l.label}</span><span class="lang-check">✓</span></button>`
+    ).join('');
+  }
+  const grid = document.getElementById('drawer-lang-grid');
+  if (grid) {
+    grid.innerHTML = LANGS.map(l =>
+      `<button type="button" class="drawer-lang-btn${l.code === currentLang ? ' active' : ''}" onclick="setLang('${l.code}');closeDrawer()">${l.label}</button>`
+    ).join('');
+  }
+  const codeEl = document.getElementById('lang-btn-code');
+  if (codeEl) codeEl.textContent = currentLang.toUpperCase();
+}
+
+// ตั้งภาษา: อัปเดต <html lang>, ฟอนต์, เมนู แล้ว re-render ทันทีจากข้อมูลที่โหลดอยู่ (ทุกภาษามากับ JSON ชุดเดียว ไม่ต้อง fetch ใหม่)
+function applyLang(code, rerender) {
+  currentLang = code;
+  document.documentElement.lang = LANG_BY_CODE[code].iso;
+  loadLangFont(code);
+  renderLangUI();
+  if (!rerender) return;
+  if (allNews.length) renderAll();
+  if (allTCCNews.length) renderTCCNews();
+  updateAlertBar();
+  if (_detailNewsId && _detailNewsObj) {
+    const t = document.getElementById('nd-title');
+    if (t) t.textContent = newsTitle(_detailNewsObj);
+  }
+}
+
+function initLang() { applyLang(detectInitialLang(), false); }
+
+function setLang(code) {
+  code = _normLang(code);
+  closeLangMenu();
+  if (!code || code === currentLang) return;
+  try { localStorage.setItem('tcc_lang', code); } catch (e) {}
+  // เก็บสำเนาไว้ใน currentUser ด้วย (กัน session หมดอายุแล้วค่าเก่าในบัญชีมาทับตัวเลือกล่าสุดของเครื่องนี้)
+  try {
+    if (currentUser) { currentUser.lang = code; localStorage.setItem('tcc_user', JSON.stringify(currentUser)); }
+  } catch (e) {}
+  applyLang(code, true);
+  saveLangToAccount(code);
+}
+
+// บันทึกภาษาลงบัญชีสมาชิก (ต้องมี token จาก login รอบใหม่ — ผู้ใช้ที่ login ค้างอยู่ก่อนหน้าจะบันทึกได้แค่ในเครื่อง)
+async function saveLangToAccount(code) {
+  if (!currentUser || !currentUser.token) return;
+  try {
+    const res = await fetchGAS('setLang', { token: currentUser.token, lang: code });
+    if (res && res.code === 'auth') {
+      currentUser.token = '';   // session หมดอายุ → login ใหม่ถึงจะบันทึกลงบัญชีได้อีก
+      localStorage.setItem('tcc_user', JSON.stringify(currentUser));
+    }
+  } catch (e) { console.warn('[TCCReport] setLang failed:', e.message); }
+}
+
+function toggleLangMenu(e) {
+  if (e) e.stopPropagation();
+  const sw = document.getElementById('lang-sw');
+  if (sw) sw.classList.toggle('open');
+}
+function closeLangMenu() {
+  const sw = document.getElementById('lang-sw');
+  if (sw) sw.classList.remove('open');
+}
+document.addEventListener('click', e => { if (!e.target.closest || !e.target.closest('#lang-sw')) closeLangMenu(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLangMenu(); });
+
+// ──────────────────────────────────────────────
+//  v38: VIEW TRACKING + MOST READ (ยอดอ่านจริงจาก GAS: action=view / action=mostread)
+//  นับ 1 ครั้งต่อข่าวต่อเซสชัน — นับแบบไม่ยืนยันตัวตน เป็นสัญญาณคร่าวๆ ไม่ใช่ตัวเลขที่กันการปั่น
+// ──────────────────────────────────────────────
+const _viewed = new Set();
+try { JSON.parse(sessionStorage.getItem('tcc_viewed') || '[]').forEach(id => _viewed.add(id)); } catch (e) {}
+const _urlToId = {};        // url ต้นทางของข่าว RSS -> id (ใช้จับการคลิกลิงก์ออกไปอ่านต้นฉบับ)
+let _mostRead = [];         // [{ id, views }]
+
+function trackView(id) {
+  id = String(id || '');
+  if (!id || _viewed.has(id)) return;
+  _viewed.add(id);
+  try { sessionStorage.setItem('tcc_viewed', JSON.stringify([..._viewed].slice(-200))); } catch (e) {}
+  if (IS_LOCAL_FILE || !GAS_URL || GAS_URL === 'YOUR_GAS_WEB_APP_URL_HERE' || _gasIs404) return;
+  fetchGAS('view', { id }).catch(() => {});
+}
+
+// ลิงก์ข่าว RSS เปิดแท็บใหม่ไปเว็บต้นทาง → จับการคลิกด้วย delegation แล้วนับยอดอ่าน (ไม่ต้องแก้ทุกจุดที่ render ลิงก์)
+document.addEventListener('click', e => {
+  const a = e.target.closest && e.target.closest('a[href]');
+  if (!a) return;
+  const id = _urlToId[a.getAttribute('href')];
+  if (id) trackView(id);
+}, true);
+
+async function fetchMostRead() {
+  try {
+    const data = await fetchGAS('mostread', { days: 7, limit: 10 });
+    _mostRead = (data && Array.isArray(data.items)) ? data.items : [];
+  } catch (e) { _mostRead = []; }
+  renderMostRead(getFilteredNews());
+}
+
+function getFilteredNews() {
+  return activeFilter !== 'all'
+    ? allNews.filter(n => n.asset_tags && n.asset_tags.includes(activeFilter))
+    : allNews;
+}
+
+// ──────────────────────────────────────────────
 //  INIT
 // ──────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  initLang();   // v38: ตั้งภาษาก่อน render ครั้งแรก (บัญชี → localStorage → ?lang= → เบราว์เซอร์ → th)
   refreshAll().then(() => checkDeepLink());
   // Auto refresh:
   // prices   ทุก 2 นาที   (GAS Sheet อัปเดตทุก 10 นาที -- 2 min poll เพียงพอ)
@@ -1590,6 +1818,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(fetchPrices,   2 * 60000);
   setInterval(fetchNews,    30 * 60000);
   setInterval(fetchTCCNews, 10 * 60000);
+  setInterval(fetchMostRead, 10 * 60000);   // v38: GAS แคช mostread 5 นาที
 });
 
 async function refreshAll() {
@@ -1600,6 +1829,7 @@ async function refreshAll() {
   await fetchTCCNews();
   await fetchEvents();
   await fetchNews();   // news สุดท้าย — ใหญ่สุด แต่ไม่บล็อก prices/events
+  await fetchMostRead();   // v38: ยอดอ่านจริง (ต้องหลัง fetchNews เพื่อจับคู่ id กับข่าว)
 }
 
 // ──────────────────────────────────────────────
@@ -1755,6 +1985,7 @@ function getMockData(action) {
       video_url:'', source_type:'tcc' },
   ]};
   if (action === 'events')      return { events: [] };
+  if (action === 'mostread')    return { items: [] };
   if (action === 'getNewsById') return { news: null };
   return { news: [] };
 }
@@ -1766,6 +1997,7 @@ async function fetchNews() {
   try {
     const data = await fetchGAS('news', { limit: 100 }); // v28.1: เพิ่มจาก 50 ให้ตรงกับ GAS default
     allNews = data.news || [];
+    allNews.forEach(n => { if (n.url && n.url !== '#') _urlToId[n.url] = n.id; });   // v38: map url -> id สำหรับนับยอดอ่าน
     console.log('[TCCReport] fetchNews got', allNews.length, 'items');
     renderAll();
     if (!IS_LOCAL_FILE) {
@@ -1928,9 +2160,7 @@ async function fetchEvents() {
 // ──────────────────────────────────────────────
 function renderAll() {
   const isFiltered = activeFilter !== 'all';
-  const filtered = isFiltered
-    ? allNews.filter(n => n.asset_tags && n.asset_tags.includes(activeFilter))
-    : allNews;
+  const filtered = getFilteredNews();
 
   renderHero(filtered);
   renderThumbStrip(filtered);
@@ -1971,7 +2201,7 @@ function renderHero(news) {
   document.getElementById('hero-cat').textContent = CAT_MAP[n.category] || n.category || 'ข่าว';
 
   const titleEl = document.getElementById('hero-title');
-  titleEl.innerHTML = `<a href="${n.url}" target="_blank" rel="noopener">${n.title_th || n.title_en}</a>`;
+  titleEl.innerHTML = `<a href="${n.url}" target="_blank" rel="noopener">${newsTitle(n)}</a>`;
 
   document.getElementById('hero-meta').innerHTML = `
     <span>${n.source}</span><span>·</span>
@@ -1984,7 +2214,7 @@ function renderHero(news) {
   imgWrap.style.height = '';  // ล้าง inline height — ให้ CSS aspect-ratio จัดการ
   if (n.image_url) {
     imgWrap.className = 'hero-img-wrap';
-    imgWrap.innerHTML = `<img src="${n.image_url}" alt="${n.title_en || ''}"
+    imgWrap.innerHTML = `<img src="${n.image_url}" alt="${escAttr(newsTitle(n))}"
       style="width:100%;height:100%;object-fit:cover;object-position:center center;display:block"
       referrerpolicy="strict-origin-when-cross-origin"
       onerror="this.parentElement.classList.add('skel');this.remove()">`;
@@ -1994,13 +2224,13 @@ function renderHero(news) {
   }
 
   document.getElementById('hero-excerpt').className = 'hero-excerpt';
-  document.getElementById('hero-excerpt').textContent = n.title_en || '';
+  document.getElementById('hero-excerpt').textContent = newsExcerpt(n);
 
   const tagsEl = document.getElementById('hero-tags');
   const tags = (n.asset_tags || []).map(t => `<span class="asset-tag">${t}</span>`).join('');
   tagsEl.innerHTML = tags
     + `<a href="${n.url}" target="_blank" rel="noopener" style="font-size:13px;font-weight:700;border-bottom:1px solid #000;margin-left:4px">อ่านต่อ →</a>`
-    + shareBtnHtml(n.id, n.title_th || n.title_en, n.url, true, n.image_url || '');
+    + shareBtnHtml(n.id, newsTitle(n), n.url, true, n.image_url || '');
 }
 
 // ──────────────────────────────────────────────
@@ -2030,11 +2260,11 @@ function renderThumbStrip(news) {
       </div>
       <div>
         <div class="thumb-cat">${CAT_MAP[n.category] || n.category}</div>
-        <a class="thumb-title" href="${n.url}" target="_blank" rel="noopener">${n.title_th || n.title_en}</a>
+        <a class="thumb-title" href="${n.url}" target="_blank" rel="noopener">${newsTitle(n)}</a>
         <div class="thumb-meta" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
           <span class="sentiment ${n.sentiment}" style="font-size:9px">${sentimentLabel(n.sentiment)}</span>
           <span>·</span><span>${timeAgo(n.timestamp)}</span>
-          ${shareBtnHtml(n.id, n.title_th || n.title_en, n.url, false, n.image_url || '')}
+          ${shareBtnHtml(n.id, newsTitle(n), n.url, false, n.image_url || '')}
         </div>
       </div>
     </div>
@@ -2075,11 +2305,11 @@ function renderFeaturedGrid(news, isFiltered) {
           : `<div class="skel" style="width:100%;height:100%"></div>`}
       </div>
       <div class="feature-cat">${CAT_MAP[n.category] || n.category}</div>
-      <div class="feature-title"><a href="${n.url}" target="_blank" rel="noopener">${n.title_th || n.title_en}</a></div>
+      <div class="feature-title"><a href="${n.url}" target="_blank" rel="noopener">${newsTitle(n)}</a></div>
       <div class="feature-meta" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
         <span class="sentiment ${n.sentiment}" style="font-size:9px">${sentimentLabel(n.sentiment)}</span>
         <span>·</span><span>${timeAgo(n.timestamp)}</span>
-        ${shareBtnHtml(n.id, n.title_th || n.title_en, n.url, false, n.image_url || '')}
+        ${shareBtnHtml(n.id, newsTitle(n), n.url, false, n.image_url || '')}
       </div>
     </div>
   `).join('');
@@ -2350,7 +2580,7 @@ function renderTCCNews() {
       mediaHtml = buildVideoHtml(vidMeta, n.id);
     } else if (n.image_url) {
       mediaHtml = `<div class="tcc-card-img-wrap" style="cursor:pointer" onclick="openNewsDetail('${n.id}')">
-           <img class="tcc-card-img" src="${n.image_url}" alt="${n.title_th || ''}" referrerpolicy="strict-origin-when-cross-origin"
+           <img class="tcc-card-img" src="${n.image_url}" alt="${escAttr(newsTitle(n))}" referrerpolicy="strict-origin-when-cross-origin"
              onerror="this.closest('.tcc-card-img-wrap').outerHTML='<div class=\\'tcc-card-img-placeholder\\'><svg width=\\'48\\' height=\\'48\\' viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'white\\' stroke-width=\\'1\\'><path d=\\'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9\\'/></svg></div>'">
          </div>`;
     } else {
@@ -2374,13 +2604,13 @@ function renderTCCNews() {
         <div class="tcc-card-body">
           <div class="tcc-card-cat">${CAT_MAP[n.category] || n.category || 'ประกาศ'}</div>
           <div class="tcc-card-title">
-            <a href="#" onclick="event.preventDefault();openNewsDetail('${n.id}')">${n.title_th || n.title_en}</a>
+            <a href="#" onclick="event.preventDefault();openNewsDetail('${n.id}')">${newsTitle(n)}</a>
           </div>
           <div class="tcc-card-meta">
             <span class="sentiment ${n.sentiment}">${sentimentLabel(n.sentiment)}</span>
             ${(n.asset_tags || []).map(t => `<span class="asset-tag">${t}</span>`).join('')}
             <span style="margin-left:auto">${timeAgo(n.timestamp)}</span>
-            ${shareBtnHtml(n.id, n.title_th || n.title_en, n.url, false, n.image_url || '')}
+            ${shareBtnHtml(n.id, newsTitle(n), n.url, false, n.image_url || '')}
           </div>
         </div>
       </div>`;
@@ -2398,12 +2628,12 @@ function renderTCCNews() {
       <div class="tcc-list-item">
         <div class="tcc-list-num">${String(i + 3).padStart(2, '0')}</div>
         <div class="tcc-list-body">
-          <h4><a href="#" onclick="event.preventDefault();openNewsDetail('${n.id}')">${n.title_th || n.title_en}</a></h4>
+          <h4><a href="#" onclick="event.preventDefault();openNewsDetail('${n.id}')">${newsTitle(n)}</a></h4>
           <div class="tcc-list-meta" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
             ${vidBadge}
             <span>${timeAgo(n.timestamp)}</span>
             ${(n.asset_tags || []).length ? '· ' + n.asset_tags.map(t => `<span class="asset-tag">${t}</span>`).join('') : ''}
-            ${shareBtnHtml(n.id, n.title_th || n.title_en, n.url, false, n.image_url || '')}
+            ${shareBtnHtml(n.id, newsTitle(n), n.url, false, n.image_url || '')}
           </div>
         </div>
       </div>`;
@@ -2447,21 +2677,21 @@ function renderSectionBlock(elId, news) {
       </div>
       <div class="sb-hero-body">
         <div class="sb-hero-cat">${CAT_MAP[hero.category] || hero.category}</div>
-        <h3><a href="${hero.url}" target="_blank" rel="noopener">${hero.title_th || hero.title_en}</a></h3>
-        <p style="font-size:13px;color:var(--gray-600);line-height:1.6">${hero.title_en || ''}</p>
+        <h3><a href="${hero.url}" target="_blank" rel="noopener">${newsTitle(hero)}</a></h3>
+        <p style="font-size:13px;color:var(--gray-600);line-height:1.6">${escHtml(newsExcerpt(hero))}</p>
         <div class="sb-hero-meta" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
           ${timeAgo(hero.timestamp)} · <span class="sentiment ${hero.sentiment}" style="font-size:9px">${sentimentLabel(hero.sentiment)}</span>
-          ${shareBtnHtml(hero.id, hero.title_th || hero.title_en, hero.url, false, hero.image_url || '')}
+          ${shareBtnHtml(hero.id, newsTitle(hero), hero.url, false, hero.image_url || '')}
         </div>
       </div>
     </div>
     <div class="sb-stories">
       ${rest.map(n => `
         <div class="sb-story">
-          <h4><a href="${n.url}" target="_blank" rel="noopener">${n.title_th || n.title_en}</a></h4>
+          <h4><a href="${n.url}" target="_blank" rel="noopener">${newsTitle(n)}</a></h4>
           <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0">
             <span class="sb-story-time">${timeAgo(n.timestamp)}</span>
-            ${shareBtnHtml(n.id, n.title_th || n.title_en, n.url, false, n.image_url || '')}
+            ${shareBtnHtml(n.id, newsTitle(n), n.url, false, n.image_url || '')}
           </div>
         </div>
       `).join('')}
@@ -2481,11 +2711,11 @@ function renderLatestFeed(news) {
     <div class="latest-item">
       <span class="latest-time">${timeAgoShort(n.timestamp)}</span>
       <div class="latest-body">
-        <h3><a href="${n.url}" target="_blank" rel="noopener">${n.title_th || n.title_en}</a></h3>
+        <h3><a href="${n.url}" target="_blank" rel="noopener">${newsTitle(n)}</a></h3>
         <div class="latest-bottom">
           <span class="sentiment ${n.sentiment}">${sentimentLabel(n.sentiment)}</span>
           ${(n.asset_tags || []).map(t => `<span class="asset-tag">${t}</span>`).join('')}
-          ${shareBtnHtml(n.id, n.title_th || n.title_en, n.url, false, n.image_url || '')}
+          ${shareBtnHtml(n.id, newsTitle(n), n.url, false, n.image_url || '')}
         </div>
       </div>
     </div>
@@ -2493,22 +2723,39 @@ function renderLatestFeed(news) {
 }
 
 // ──────────────────────────────────────────────
-//  SIDEBAR: MOST READ (rank by recency here; ถ้าต้องการ view count ต้องเพิ่ม column ใน Sheet)
+//  SIDEBAR: MOST READ (v38: ยอดอ่านจริงจาก Sheet Views ผ่าน GAS action=mostread; fallback = ข่าวล่าสุด)
 // ──────────────────────────────────────────────
 function renderMostRead(news) {
   const el = document.getElementById('most-read-list');
-  const items = [...news].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 5);
+  if (!el) return;
+  // v38: ใช้ยอดอ่านจริง (GAS action=mostread, 7 วัน) จับคู่กับข่าวที่โหลดอยู่
+  //      ถ้ายังไม่มีข้อมูลยอดอ่าน → fallback เป็น 5 ข่าวล่าสุดตามเวลา (เหมือนเดิม)
+  const pool = (activeFilter === 'all') ? [...(allTCCNews || []), ...(allNews || [])] : (news || []);
+  const byId = new Map(pool.map(n => [String(n.id), n]));
+  let items = (_mostRead || [])
+    .map(r => { const n = byId.get(String(r.id)); return n ? { n, views: r.views } : null; })
+    .filter(Boolean).slice(0, 5);
+  const real = items.length > 0;
+  if (!real) {
+    items = [...(news || [])].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+      .slice(0, 5).map(n => ({ n, views: 0 }));
+  }
   if (!items.length) return;
 
-  el.innerHTML = items.map((n, i) => `
+  el.innerHTML = items.map(({ n, views }, i) => {
+    const link = n.source_type === 'tcc'
+      ? `<a href="#" onclick="event.preventDefault();openNewsDetail('${n.id}')">${newsTitle(n)}</a>`
+      : `<a href="${n.url}" target="_blank" rel="noopener">${newsTitle(n)}</a>`;
+    const meta = real ? `👁 ${Number(views || 0).toLocaleString('en-US')} · ${timeAgo(n.timestamp)}` : timeAgo(n.timestamp);
+    return `
     <div class="most-read-item">
-      <div class="mr-num">0${i+1}</div>
+      <div class="mr-num">0${i + 1}</div>
       <div class="mr-body">
-        <h4><a href="${n.url}" target="_blank" rel="noopener">${n.title_th || n.title_en}</a></h4>
-        <div class="mr-meta">${timeAgo(n.timestamp)}</div>
+        <h4>${link}</h4>
+        <div class="mr-meta">${meta}</div>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 // ──────────────────────────────────────────────
@@ -2611,7 +2858,7 @@ function updateAlertBar() {
   if (!allNews.length) return;
   const latest = allNews[0];
   document.getElementById('alert-text').textContent =
-    `${latest.title_th || latest.title_en} — ${timeAgo(latest.timestamp)}`;
+    `${newsTitle(latest)} — ${timeAgo(latest.timestamp)}`;
 }
 
 // ──────────────────────────────────────────────
@@ -2787,58 +3034,51 @@ function showAuthMsg(type, text) {
 }
 
 // ══════════════════════════════════════════════
-//  SHARE SYSTEM  (v35)
-//  ─ ทุกข่าวใช้ TCC deep-link เป็นลิงก์หลักเสมอ
-//  ─ originalUrl (ต้นฉบับ) แนบเป็น secondary text ใน social post
-//  ─ image_url ส่งผ่านไปใน Telegram/social via og-proxy (GAS v27)
+//  SHARE SYSTEM  (v38 — Cloudflare Worker)
+//  ─ ลิงก์แชร์ = <WORKERS_URL>/n/<id>?lang=xx  (ทุกช่องทางส่ง URL เดียว ไม่มี text เพิ่ม)
+//  ─ บอท (Telegram/Facebook/LINE/X ...) → Worker คืน OG ของข่าวนั้นจริง | คนจริง → Worker 302 ไป SPA ?news=id
+//  ─ ถ้า WORKERS_URL ว่าง → fallback เป็นลิงก์ GitHub Pages (?news=id&lang=xx)
+//  ─ มือถือ: ปุ่ม "แชร์ผ่านแอปในอุปกรณ์" ใช้ Web Share API
 // ══════════════════════════════════════════════
 
 let _shareNewsId   = null;   // id ของข่าวที่กำลัง share
 let _shareTitle    = '';
-let _shareUrl      = '';     // GitHub Pages URL — แสดงใน input + copy
-let _ogProxyUrl    = '';     // GAS ogProxy URL — ส่งให้ bot เฉพาะตอนกดปุ่ม platform
-let _shareOrigUrl  = '';     // URL ต้นฉบับ (RSS) — ไม่ใช้ใน v37
+let _shareUrl      = '';     // ลิงก์แชร์ (Worker /n/<id>?lang=xx) — แสดงใน input, copy และส่งให้ทุก platform
 let _shareImageUrl = '';     // image_url ของข่าว
 let _detailNewsId  = null;   // id ของข่าวที่กำลังแสดง detail
 
-// ── Build TCC deep-link URL (GitHub Pages) ──
-function buildShareURL(newsId) {
+// ── Build TCC deep-link URL (GitHub Pages / SPA) — ใช้กับ address bar และ fallback ──
+function buildShareURL(newsId, lang) {
   const base = window.location.origin + window.location.pathname;
-  return base + '?news=' + encodeURIComponent(newsId);
+  return base + '?news=' + encodeURIComponent(newsId) + (lang ? '&lang=' + encodeURIComponent(lang) : '');
 }
 
-// ── Build Share URL สำหรับ social platforms (v37) ──
-// Priority: Cloudflare Workers → GAS ogProxy → GitHub Pages deep-link
-// URL นี้ใช้สำหรับแชร์ไป social ทุก platform (ไม่ใช้สำหรับ copy link)
-// Workers/GAS return HTML+OG tags → bot อ่าน preview ถูกต้อง → JS redirect ไป SPA
+// ── Build ลิงก์แชร์ (v38) ──
+// พ่วง ?lang=<ภาษาที่ผู้แชร์เลือก> เพื่อให้ Worker ใช้หัวข่าวภาษานั้นเป็น og:title
+// ผู้รับที่ยังไม่เคยตั้งภาษาจะเห็นหัวข่าวภาษาตามลิงก์ (ดู detectInitialLang)
 function buildSocialShareURL(newsId) {
-  // 1. Cloudflare Workers (preferred) — เร็วกว่า GAS, ไม่ติด rate limit
   if (WORKERS_URL) {
-    return WORKERS_URL + '/?news=' + encodeURIComponent(newsId);
+    return WORKERS_URL.replace(/\/+$/, '') + '/n/' + encodeURIComponent(newsId) + '?lang=' + encodeURIComponent(currentLang);
   }
-  // 2. GAS ogProxy — fallback ถ้าไม่มี Workers
-  if (GAS_URL && GAS_URL !== 'YOUR_GAS_WEB_APP_URL_HERE') {
-    return GAS_URL + '?action=ogProxy&id=' + encodeURIComponent(newsId);
-  }
-  // 3. GitHub Pages deep-link — fallback สุดท้าย (bot อ่าน OG ไม่ได้ แต่ดีกว่าไม่มี URL)
-  return buildShareURL(newsId);
+  // ยังไม่ได้ตั้ง WORKERS_URL → GitHub Pages deep-link (บอทอ่าน OG ของข่าวไม่ได้ ได้แค่การ์ดของเว็บ)
+  return buildShareURL(newsId, currentLang);
 }
 
-// ── Open Share Modal (v38) ──
-// _shareUrl    = GitHub Pages URL → แสดงใน input + copy → ผู้ใช้เห็น URL จริง
-// _ogProxyUrl  = GAS ogProxy URL → ส่งให้ bot เฉพาะตอนกดปุ่ม platform → preview ถูกต้อง
+// ── Open Share Modal ──
 function openShareModal(newsId, title, origUrl, imageUrl) {
   _shareNewsId   = newsId;
   _shareTitle    = title;
   _shareImageUrl = imageUrl || '';
 
-  // URL แสดงใน input = GitHub Pages URL เสมอ (ผู้ใช้เห็น URL จริง)
-  _shareUrl    = buildShareURL(newsId);
+  // ลิงก์เดียวใช้ทั้งช่อง copy และทุกปุ่ม platform
+  _shareUrl = buildSocialShareURL(newsId);
 
-  // URL สำหรับ bot = GAS ogProxy (bot fetch → อ่าน OG tags → preview ถูกต้อง)
-  _ogProxyUrl  = (GAS_URL && GAS_URL !== 'YOUR_GAS_WEB_APP_URL_HERE')
-    ? GAS_URL + '?action=ogProxy&id=' + encodeURIComponent(newsId)
-    : _shareUrl; // fallback: ถ้าไม่มี GAS → ใช้ GitHub Pages (preview อาจไม่มีรูป)
+  // Web Share API — แสดงเฉพาะอุปกรณ์สัมผัสที่รองรับ
+  const nativeBtn = document.getElementById('btn-native-share');
+  if (nativeBtn) {
+    const canNative = !!navigator.share && !!(window.matchMedia && window.matchMedia('(pointer:coarse)').matches);
+    nativeBtn.style.display = canNative ? 'flex' : 'none';
+  }
 
   // ── อัปเดต modal ──
   document.getElementById('share-headline').textContent = title;
@@ -2907,10 +3147,8 @@ async function copyShareLink() {
 }
 
 // ── Social Share ──
-// ส่ง _shareUrl (GitHub Pages URL) ให้ทุก platform เสมอ
-// → ผู้ใช้เห็น URL ที่ถูกต้องใน chat และคลิกไปยังเว็บได้โดยตรง
-// OG preview: GitHub Pages ฝัง meta OG ไว้ใน <head> อยู่แล้ว
-//             สำหรับ preview รูปข่าวจริง ต้อง update OG ผ่าน GAS ogProxy ฝั่ง server
+// ทุก platform ส่งลิงก์เดียว (_shareUrl = Worker /n/<id>?lang=xx) ไม่แนบ text เพิ่ม
+// → บอทของแต่ละ platform ดึง OG ของข่าวจาก Worker | ผู้ใช้คลิกแล้ว Worker 302 ไปหน้า SPA
 
 function shareToFacebook() {
   const u = encodeURIComponent(_shareUrl);
@@ -2918,8 +3156,8 @@ function shareToFacebook() {
 }
 
 function shareToTwitter() {
-  const text = encodeURIComponent(_shareTitle + '\n\n' + _shareUrl);
-  window.open('https://twitter.com/intent/tweet?text=' + text, '_blank', 'width=600,height=400,noopener');
+  const u = encodeURIComponent(_shareUrl);
+  window.open('https://twitter.com/intent/tweet?url=' + u, '_blank', 'width=600,height=400,noopener');
 }
 
 function shareToLine() {
@@ -2928,10 +3166,14 @@ function shareToLine() {
 }
 
 function shareToTelegram() {
-  // url= ต้องเป็น GitHub Pages URL — Telegram แสดง URL นี้ตรงๆ ใน chat
-  // ถ้าใส่ ogProxy URL → ผู้ใช้จะเห็น script.google.com ใน chat แทน
   const u = encodeURIComponent(_shareUrl);
   window.open('https://t.me/share/url?url=' + u, '_blank', 'width=600,height=500,noopener');
+}
+
+// Web Share API (มือถือ) — ส่งเฉพาะ title + url (ไม่ใส่ text เพื่อให้พรีวิวใช้ลิงก์ Worker)
+function shareNative() {
+  if (!navigator.share || !_shareUrl) return;
+  navigator.share({ title: _shareTitle, url: _shareUrl }).catch(() => {});
 }
 
 // ── Share button HTML snippet ──
@@ -2972,6 +3214,8 @@ function openNewsDetail(newsId) {
 
 function _renderNewsDetail(n) {
   _detailNewsId = n.id;
+  _detailNewsObj = n;      // v38: ใช้อัปเดตหัวข่าวตอนสลับภาษาขณะเปิด modal
+  trackView(n.id);         // v38: นับยอดอ่าน (1 ครั้งต่อข่าวต่อเซสชัน)
 
   // ── Media: วิดีโอ > รูปภาพ > ว่าง ──
   const imgEl   = document.getElementById('nd-img');
@@ -2998,7 +3242,7 @@ function _renderNewsDetail(n) {
   }
 
   document.getElementById('nd-cat').textContent   = CAT_MAP[n.category] || n.category || 'ข่าว';
-  document.getElementById('nd-title').textContent = n.title_th || n.title_en || '';
+  document.getElementById('nd-title').textContent = newsTitle(n) || '';
   document.getElementById('nd-meta').innerHTML    = `
     <span>${n.source || 'TCC'}</span><span>·</span>
     <span>${timeAgo(n.timestamp)}</span>
@@ -3007,8 +3251,8 @@ function _renderNewsDetail(n) {
   document.getElementById('nd-tags').innerHTML =
     (n.asset_tags || []).map(t => `<span class="asset-tag">${t}</span>`).join('');
 
-  // body_th ถ้ามี (TCC news), ไม่งั้นใช้ title_en เป็น excerpt
-  const body = n.body_th || n.title_en || '';
+  // body_th ถ้ามี (ข่าว TCC) -> summary (ข่าว RSS) -> title_en ถ้าต่างจากหัวข่าวที่แสดง
+  const body = n.body_th ? n.body_th : escHtml(newsExcerpt(n));
   document.getElementById('nd-body').innerHTML = body
     ? `<p>${body.replace(/\n/g, '</p><p>')}</p>`
     : `<p style="color:var(--gray-400)">คลิก "อ่านต่อ" เพื่อดูเนื้อหาฉบับเต็มที่แหล่งข่าว</p>`;
@@ -3029,9 +3273,9 @@ function _renderNewsDetail(n) {
 
   // ── v35: Dynamic OG / Twitter meta tags ──
   // ทำให้ preview ถูกต้องเมื่อ copy URL ไปวางใน Telegram / LINE / Discord
-  // (บอทที่ fetch URL จะได้ OG จาก GAS ogProxy — แต่อัปเดตไว้ด้วยเผื่อ JS-capable crawler)
-  _updateOgMeta(n.title_th || n.title_en || 'TCC Financial Reports',
-                n.title_en || n.body_th || 'ข่าว Crypto อัปเดตทุก 30 นาที',
+  // (บอทที่ fetch ลิงก์แชร์จะได้ OG จาก Cloudflare Worker /n/<id> — ฟังก์ชันนี้อัปเดตไว้ให้ JS-capable crawler / แท็บเบราว์เซอร์)
+  _updateOgMeta(newsTitle(n) || 'TCC Financial Reports',
+                newsExcerpt(n).slice(0, 200) || 'ข่าว Crypto อัปเดตทุก 30 นาที',
                 n.image_url || '',
                 deepUrl);
 }
@@ -3062,6 +3306,7 @@ function closeNewsDetail() {
   document.getElementById('news-detail-overlay').classList.remove('open');
   document.body.style.overflow = '';
   _detailNewsId = null;
+  _detailNewsObj = null;
   // คืน URL เดิม
   history.pushState({}, '', window.location.pathname);
 }
@@ -3076,7 +3321,7 @@ function openShareFromDetail() {
   const news = [...(allTCCNews || []), ...(allNews || [])].find(n => n.id === _detailNewsId);
   if (!news) return;
   closeNewsDetail();
-  setTimeout(() => openShareModal(news.id, news.title_th || news.title_en, news.url, news.image_url || ''), 50);
+  setTimeout(() => openShareModal(news.id, newsTitle(news), news.url, news.image_url || ''), 50);
 }
 
 // ── Fetch single news by ID from GAS (deep-link cold load) ──
@@ -3143,8 +3388,21 @@ async function doLogin() {
   try {
     const res = await fetchGAS('login', { email, pass: btoa(pass) });
     if (res && res.success) {
-      currentUser = { email, name: res.name || email.split('@')[0], uid: res.uid || email };
+      // v38: เก็บ token (ใช้ยืนยันตัวตนกับ action=setLang) + ภาษาที่บันทึกไว้ในบัญชี
+      currentUser = { email, name: res.name || email.split('@')[0], uid: res.uid || email, token: res.token || '', lang: _normLang(res.lang) };
+      let _hadLocalLang = '';
+      try { _hadLocalLang = _normLang(localStorage.getItem('tcc_lang')); } catch (e) {}
       localStorage.setItem('tcc_user', JSON.stringify(currentUser));
+      if (currentUser.lang) {
+        // ลำดับความสำคัญ: ภาษาในบัญชี > localStorage
+        try { localStorage.setItem('tcc_lang', currentUser.lang); } catch (e) {}
+        if (currentUser.lang !== currentLang) applyLang(currentUser.lang, true);
+      } else if (_hadLocalLang && currentUser.token) {
+        // บัญชียังไม่เคยตั้งภาษา แต่เครื่องนี้เคยเลือกไว้ → บันทึกขึ้นบัญชี (เฉพาะที่ผู้ใช้เลือกเอง ไม่ใช่ค่าที่เดาจากเบราว์เซอร์)
+        currentUser.lang = _hadLocalLang;
+        localStorage.setItem('tcc_user', JSON.stringify(currentUser));
+        saveLangToAccount(_hadLocalLang);
+      }
       renderAuthState();
       showAuthMsg('success', `✅ ยินดีต้อนรับ ${currentUser.name}!`);
       setTimeout(closeModal, 1200);
