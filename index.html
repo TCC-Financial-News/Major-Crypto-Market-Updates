@@ -3056,14 +3056,44 @@ function _evSafeUrl(u) {
   u = String(u || '').trim();
   return /^https?:\/\//i.test(u) ? u : '';
 }
-function _evRange(ev, locale) {
+// v41: ชื่อเดือนย่อตามภาษาที่เลือก -- ไม่พึ่ง Intl/ICU ของเบราว์เซอร์ (กันเดือนไทย/ปี พ.ศ. หลุดมาตอนเลือกภาษาอื่น)
+const EV_MONTHS = {
+  th: ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'],
+  en: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+  vi: ['Th1','Th2','Th3','Th4','Th5','Th6','Th7','Th8','Th9','Th10','Th11','Th12'],
+  kh: ['មករា','កុម្ភៈ','មីនា','មេសា','ឧសភា','មិថុនា','កក្កដា','សីហា','កញ្ញា','តុលា','វិច្ឆិកា','ធ្នូ'],
+  mm: ['ဇန်','ဖေ','မတ်','ဧ','မေ','ဇွန်','ဇူ','ဩ','စက်','အောက်','နို','ဒီ'],
+  la: ['ມ.ກ.','ກ.ພ.','ມ.ນ.','ມ.ສ.','ພ.ພ.','ມິ.ຖ.','ກ.ລ.','ສ.ຫ.','ກ.ຍ.','ຕ.ລ.','ພ.ຈ.','ທ.ວ.'],
+  ms: ['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogo','Sep','Okt','Nov','Dis'],
+  id: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],
+  zh: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
+};
+function _evLang() { return EV_MONTHS[currentLang] ? currentLang : 'en'; }
+function _evMonth(d) { return EV_MONTHS[_evLang()][d.getMonth()]; }
+function _evYear(d) { return _evLang() === 'th' ? d.getFullYear() + 543 : d.getFullYear(); }   // ไทยใช้ พ.ศ. ภาษาอื่นใช้ ค.ศ.
+function _evFull(d) {
+  if (_evLang() === 'zh') return _evYear(d) + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日';
+  return d.getDate() + ' ' + _evMonth(d) + ' ' + _evYear(d);
+}
+// ชื่ออีเวนต์: title_<lang> ถ้ามี -> ไม่งั้นถ้าไม่ใช่ไทย ตัดวงเล็บที่เป็นภาษาไทยออก (เช่น "FOMC Meeting (ธนาคารกลางสหรัฐ Fed)")
+function _evTitle(ev) {
+  const lg = currentLang;
+  const own = lg && lg !== 'th' && ev['title_' + lg] ? String(ev['title_' + lg]).trim() : '';
+  if (own) return own;
+  const base = String(ev.title || '');
+  if (lg === 'th') return base;
+  const clean = base.replace(/\s*[\(（][^\)）]*[\u0E00-\u0E7F][^\)）]*[\)）]/g, '').trim();
+  return clean || base;
+}
+function _evRange(ev) {
   const a = _evParse(ev.date), b = _evParse(ev.end_date);
   if (!a) return '';
-  const full = (d) => d.toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' });
-  if (!b || +b === +a) return full(a);
-  if (a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth())
-    return a.getDate() + '–' + b.getDate() + ' ' + a.toLocaleDateString(locale, { month: 'short', year: 'numeric' });
-  return full(a) + ' – ' + full(b);
+  if (!b || +b === +a) return _evFull(a);
+  if (a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth()) {
+    if (_evLang() === 'zh') return _evYear(a) + '年' + (a.getMonth() + 1) + '月' + a.getDate() + '–' + b.getDate() + '日';
+    return a.getDate() + '–' + b.getDate() + ' ' + _evMonth(a) + ' ' + _evYear(a);
+  }
+  return _evFull(a) + ' – ' + _evFull(b);
 }
 
 function renderEvents(events) {
@@ -3071,8 +3101,7 @@ function renderEvents(events) {
   const el = document.getElementById('events-list');
   const tabsEl = document.getElementById('ev-tabs');
   if (!el) return;
-  const locale = (LANG_BY_CODE[currentLang] || {}).iso || 'th';
-  const month = (d) => d.toLocaleDateString(locale, { month: 'short' });
+  const month = _evMonth;   // v41: ตารางชื่อเดือนของเราเอง
 
   // แท็บภูมิภาค (แสดงจำนวนต่อภูมิภาค; ซ่อนภูมิภาคที่ไม่มีรายการ ยกเว้นที่กำลังเลือกอยู่)
   const counts = { all: _allEvents.length };
@@ -3101,7 +3130,7 @@ function renderEvents(events) {
     const d = _evParse(ev.date);
     if (!d) return '';
     const url = _evSafeUrl(ev.url);
-    const title = escHtml(ev.title || '');
+    const title = escHtml(_evTitle(ev));
     const titleHtml = url
       ? `<a class="event-title" href="${escHtml(url)}" target="_blank" rel="noopener noreferrer">${title}</a>`
       : `<span class="event-title">${title}</span>`;
@@ -3115,7 +3144,7 @@ function renderEvents(events) {
         </div>
         <div>
           ${titleHtml}
-          <div class="ev-range">${cat}${escHtml(_evRange(ev, locale))}</div>
+          <div class="ev-range">${cat}${escHtml(_evRange(ev))}</div>
           ${place ? `<div class="event-loc">📍 ${place}</div>` : ''}
         </div>
       </div>`;
