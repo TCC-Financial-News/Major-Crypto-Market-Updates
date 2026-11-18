@@ -1104,6 +1104,44 @@ const IS_LOCAL_FILE = window.location.protocol === 'file:';
   }
 })();
 </script>
+<script>
+// ═══ UI I18N (v40) — English is the base language; th/zh complete; other languages fall back to English ═══
+const I18N = {"th": {"nav_news": "ข่าว", "nav_prices": "ราคา", "nav_analysis": "วิเคราะห์", "nav_research": "วิจัย", "nav_events": "อีเวนต์", "nav_tcc": "ข่าว TCC", "nav_tcc_m": "ข่าว TCC Official", "cat_markets": "ตลาด", "cat_finance": "การเงิน", "cat_policy": "นโยบาย", "cat_tech": "เทคโนโลยี", "cat_business": "ธุรกิจ", "cat_news": "ข่าว", "cat_announce": "ประกาศ", "lang_headline": "ภาษาหัวข่าว", "menu": "เมนู", "dark_toggle": "สลับโหมดมืด/สว่าง", "dark_mode": "โหมดมืด", "light_mode": "โหมดสว่าง", "on": "เปิด", "off": "ปิด", "sign_in": "เข้าสู่ระบบ", "sign_up": "สมัครสมาชิก", "sign_out": "ออกจากระบบ", "profile": "โปรไฟล์", "settings": "ตั้งค่า", "loading_latest": "กำลังโหลดข้อมูลล่าสุด...", "loading_data": "กำลังโหลดข้อมูล...", "loading": "กำลังโหลด...", "refresh_t": "รีเฟรช", "refresh": "↻ รีเฟรช", "showing_cached": "แสดงข้อมูลล่าสุด · กำลังอัปเดต...", "updated_at": "อัปเดตล่าสุด: {t}", "updated_short": "อัปเดต", "gas_expired": "GAS URL หมดอายุ -- redeploy GAS แล้วอัปเดต URL ใน config", "gas_down": "GAS ไม่ตอบสนอง -- retry ทุก 5 นาที", "no_news_sheet": "ไม่มีข้อมูลข่าว — Sheet News อาจว่างเปล่า", "load_failed": "โหลดข้อมูลไม่สำเร็จ — ", "no_news": "ไม่มีข้อมูลข่าว", "no_data": "ไม่มีข้อมูล", "all": "ทั้งหมด", "sec_featured": "ข่าวเด่น", "view_all": "ดูทั้งหมด →", "view_all_n": "ดูทั้งหมด ({n}) →", "collapse": "ย่อ ↑", "sec_opinion": "ความเห็น", "sec_latest": "ข่าวล่าสุด", "sec_most_read": "อ่านมากที่สุด", "sec_prices": "ราคาสด", "sec_events": "อีเวนต์ที่กำลังจะมาถึง", "op1": "ส่วนหนึ่งของ FTX รอดมาได้ และมันคือเหตุผลที่ต้องมี CLARITY Act", "op2": "ตลาดเสรีและนวัตกรรม — แต่ยังไม่สมบูรณ์แบบ", "op3": "Crypto อาจกลายเป็นสถาบัน แต่ยังเทรดเหมือนข่าวลือ", "op_n1": "รันดี เอเบอร์เนธี", "op_n2": "ซัมเมอร์ เมอร์ซิงเกอร์", "op_n3": "ฟาเบียน โดริ", "op_i1": "ร", "op_i2": "ซ", "op_i3": "ฟ", "op_d1": "7 ส.ค. 2569", "op_d2": "6 ส.ค. 2569", "op_d3": "5 ส.ค. 2569", "nl_tag": "จดหมายข่าว", "nl_desc": "ข่าว Crypto สำคัญและแนวคิดประจำวัน ส่งตรงถึงกล่องข้อความของคุณทุกเช้า", "nl_name_ph": "ชื่อของคุณ (ไม่บังคับ)", "nl_email_ph": "อีเมลของคุณ", "nl_btn": "สมัครรับข่าวสาร", "nl_note": "การสมัครรับข่าวสาร แสดงว่าคุณยอมรับ", "reg_note": "การสมัครสมาชิก แสดงว่าคุณยอมรับ", "terms": "ข้อกำหนดการใช้งาน", "and": "และ", "privacy": "นโยบายความเป็นส่วนตัว", "processing": "กำลังดำเนินการ...", "sending": "กำลังส่งข้อมูล...", "subscribed": "สมัครแล้ว", "no_stock": "ยังไม่มีข้อมูลหุ้น", "updated_dash": "อัปเดตล่าสุด: —", "view_all_prices": "ดูราคาทั้งหมด →", "loading_prices": "กำลังโหลดราคา...", "ev_none": "ยังไม่มีอีเวนต์ที่กำลังจะมาถึง", "ev_none_region": "ยังไม่มีอีเวนต์ในภูมิภาคนี้", "region": "ภูมิภาค", "evr_all": "ทั้งหมด", "evr_eu": "ยุโรป", "evr_am": "อเมริกา", "evr_as": "เอเชีย", "evr_sea": "เอเชียตะวันออกเฉียงใต้", "evc_crypto": "🪙 คริปโต", "evc_finance": "💵 การเงิน", "evc_gold": "🥇 ทองคำ", "close": "ปิด", "share_this": "แชร์ข่าวนี้", "copy": "คัดลอก", "copied": "คัดลอกแล้ว", "share_native": "📲 แชร์ผ่านแอปในอุปกรณ์", "share_to": "แชร์ไปยัง", "share": "แชร์", "read_source": "อ่านต่อที่แหล่งข่าว →", "read_more": "อ่านต่อ →", "detail_nobody": "คลิก \"อ่านต่อ\" เพื่อดูเนื้อหาฉบับเต็มที่แหล่งข่าว", "video": "วิดีโอ", "play_video": "เล่นวิดีโอ", "view_tiktok": "ดูวิดีโอนี้ใน TikTok", "view_origin": "ดูที่ต้นทาง", "video_notfound": "ไม่พบวิดีโอต้นฉบับ", "video_unavail": "ไม่สามารถแสดงตัวอย่างวิดีโอนี้ได้", "no_tcc": "ยังไม่มีข่าวประกาศจาก TCC", "welcome_back": "ยินดีต้อนรับกลับ", "login_sub": "เข้าสู่ระบบเพื่อติดตามข่าว Crypto ที่คุณสนใจ", "email": "อีเมล", "err_email": "กรุณาระบุอีเมลที่ถูกต้อง", "password": "รหัสผ่าน", "err_pass": "กรุณาระบุรหัสผ่าน", "forgot": "ลืมรหัสผ่าน?", "no_account": "ยังไม่มีบัญชี?", "signup_free": "สมัครสมาชิกฟรี", "create_acct": "สร้างบัญชีใหม่", "signup_sub": "สมัครฟรี รับข่าว Crypto ส่วนตัวของคุณ", "full_name": "ชื่อ-นามสกุล", "name_ph": "ชื่อของคุณ", "err_name": "กรุณาระบุชื่อ", "pass_hint": "(อย่างน้อย 6 ตัวอักษร)", "err_pass_len": "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร", "confirm_pass": "ยืนยันรหัสผ่าน", "err_pass_match": "รหัสผ่านไม่ตรงกัน", "have_account": "มีบัญชีแล้ว?", "signing_in": "กำลังเข้าสู่ระบบ...", "signing_up": "กำลังสมัครสมาชิก...", "welcome_user": "ยินดีต้อนรับ {name}!", "signup_ok": "สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ", "generic_err": "เกิดข้อผิดพลาด กรุณาลองใหม่", "bad_login": "อีเมลหรือรหัสผ่านไม่ถูกต้อง", "email_taken": "อีเมลนี้ถูกใช้งานแล้ว", "og_desc": "ข่าว Crypto อัปเดตทุก 30 นาที", "ago_s": "{n} วินาทีที่แล้ว", "ago_m": "{n} นาทีที่แล้ว", "ago_h": "{n} ชั่วโมงที่แล้ว", "ago_d": "{n} วันที่แล้ว", "s_s": "{n}ว.", "s_m": "{n} นาที", "s_h": "{n} ชม.", "s_d": "{n} วัน", "srv_need_creds": "กรุณาระบุอีเมลและรหัสผ่าน", "srv_no_account": "ไม่พบบัญชีนี้ในระบบ", "srv_suspended": "บัญชีถูกระงับการใช้งาน", "srv_bad_password": "รหัสผ่านไม่ถูกต้อง", "srv_incomplete": "ข้อมูลไม่ครบถ้วน", "srv_bad_email": "รูปแบบอีเมลไม่ถูกต้อง", "srv_email_taken": "อีเมลนี้มีบัญชีอยู่แล้ว", "srv_registered": "สมัครสมาชิกสำเร็จ", "srv_already_subscribed": "อีเมลนี้สมัครรับข่าวสารอยู่แล้ว", "srv_resubscribed": "เปิดรับข่าวสารอีกครั้งแล้ว", "srv_subscribed": "สมัครรับข่าวสารสำเร็จ! กรุณาตรวจสอบอีเมลของคุณ", "srv_unsubscribed": "ยกเลิกการรับข่าวสารเรียบร้อยแล้ว", "srv_auth": "เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่"}, "en": {"nav_news": "News", "nav_prices": "Prices", "nav_analysis": "Analysis", "nav_research": "Research", "nav_events": "Events", "nav_tcc": "TCC News", "nav_tcc_m": "TCC Official News", "cat_markets": "Markets", "cat_finance": "Finance", "cat_policy": "Policy", "cat_tech": "Technology", "cat_business": "Business", "cat_news": "News", "cat_announce": "Announcement", "lang_headline": "Headline language", "menu": "Menu", "dark_toggle": "Toggle dark/light mode", "dark_mode": "Dark mode", "light_mode": "Light mode", "on": "On", "off": "Off", "sign_in": "Sign in", "sign_up": "Sign up", "sign_out": "Sign out", "profile": "Profile", "settings": "Settings", "loading_latest": "Loading latest data...", "loading_data": "Loading data...", "loading": "Loading...", "refresh_t": "Refresh", "refresh": "↻ Refresh", "showing_cached": "Showing latest data · updating...", "updated_at": "Last updated: {t}", "updated_short": "Updated", "gas_expired": "GAS URL expired -- redeploy GAS and update the URL in config", "gas_down": "GAS not responding -- retrying every 5 min", "no_news_sheet": "No news data — the News sheet may be empty", "load_failed": "Failed to load data — ", "no_news": "No news data", "no_data": "No data", "all": "All", "sec_featured": "Featured", "view_all": "View all →", "view_all_n": "View all ({n}) →", "collapse": "Collapse ↑", "sec_opinion": "Opinion", "sec_latest": "Latest News", "sec_most_read": "Most Read", "sec_prices": "Live Prices", "sec_events": "Upcoming Events", "op1": "Part of FTX survived, and that is why we need the CLARITY Act", "op2": "Free markets and innovation — but not yet perfect", "op3": "Crypto may become an institution, but it still trades like a rumor", "op_n1": "Randi Abernethy", "op_n2": "Summer Mersinger", "op_n3": "Fabian Dori", "op_i1": "R", "op_i2": "S", "op_i3": "F", "op_d1": "7 Aug 2026", "op_d2": "6 Aug 2026", "op_d3": "5 Aug 2026", "nl_tag": "Newsletter", "nl_desc": "Top crypto news and daily insights, delivered to your inbox every morning", "nl_name_ph": "Your name (optional)", "nl_email_ph": "Your email", "nl_btn": "Subscribe", "nl_note": "By subscribing, you agree to our", "reg_note": "By signing up, you agree to our", "terms": "Terms of Use", "and": "and", "privacy": "Privacy Policy", "processing": "Processing...", "sending": "Sending...", "subscribed": "Subscribed", "no_stock": "No stock data yet", "updated_dash": "Last updated: —", "view_all_prices": "View all prices →", "loading_prices": "Loading prices...", "ev_none": "No upcoming events", "ev_none_region": "No events in this region", "region": "Region", "evr_all": "All", "evr_eu": "Europe", "evr_am": "Americas", "evr_as": "Asia", "evr_sea": "Southeast Asia", "evc_crypto": "🪙 Crypto", "evc_finance": "💵 Finance", "evc_gold": "🥇 Gold", "close": "Close", "share_this": "Share this story", "copy": "Copy", "copied": "Copied", "share_native": "📲 Share via device apps", "share_to": "Share to", "share": "Share", "read_source": "Read at source →", "read_more": "Read more →", "detail_nobody": "Click \"Read more\" to see the full story at the source", "video": "Video", "play_video": "Play video", "view_tiktok": "Watch this video on TikTok", "view_origin": "View at source", "video_notfound": "Original video not found", "video_unavail": "This video preview is unavailable", "no_tcc": "No announcements from TCC yet", "welcome_back": "Welcome back", "login_sub": "Sign in to follow the crypto news you care about", "email": "Email", "err_email": "Please enter a valid email", "password": "Password", "err_pass": "Please enter your password", "forgot": "Forgot password?", "no_account": "No account yet?", "signup_free": "Sign up for free", "create_acct": "Create a new account", "signup_sub": "Sign up free and get personalised crypto news", "full_name": "Full name", "name_ph": "Your name", "err_name": "Please enter your name", "pass_hint": "(at least 6 characters)", "err_pass_len": "Password must be at least 6 characters", "confirm_pass": "Confirm password", "err_pass_match": "Passwords do not match", "have_account": "Already have an account?", "signing_in": "Signing in...", "signing_up": "Signing up...", "welcome_user": "Welcome, {name}!", "signup_ok": "Signed up successfully! Please sign in", "generic_err": "Something went wrong. Please try again", "bad_login": "Incorrect email or password", "email_taken": "This email is already in use", "og_desc": "Crypto news updated every 30 minutes", "ago_s": "{n}s ago", "ago_m": "{n} min ago", "ago_h": "{n} hr ago", "ago_d": "{n}d ago", "s_s": "{n}s", "s_m": "{n}m", "s_h": "{n}h", "s_d": "{n}d", "srv_need_creds": "Please enter email and password", "srv_no_account": "Account not found", "srv_suspended": "This account is suspended", "srv_bad_password": "Incorrect password", "srv_incomplete": "Incomplete information", "srv_bad_email": "Invalid email format", "srv_email_taken": "An account with this email already exists", "srv_registered": "Signed up successfully", "srv_already_subscribed": "This email is already subscribed", "srv_resubscribed": "Subscription reactivated", "srv_subscribed": "Subscribed! Please check your email", "srv_unsubscribed": "You have been unsubscribed", "srv_auth": "Session expired. Please sign in again"}, "zh": {"nav_news": "新闻", "nav_prices": "行情", "nav_analysis": "分析", "nav_research": "研究", "nav_events": "活动", "nav_tcc": "TCC 新闻", "nav_tcc_m": "TCC 官方新闻", "cat_markets": "市场", "cat_finance": "金融", "cat_policy": "政策", "cat_tech": "科技", "cat_business": "商业", "cat_news": "新闻", "cat_announce": "公告", "lang_headline": "标题语言", "menu": "菜单", "dark_toggle": "切换深色/浅色模式", "dark_mode": "深色模式", "light_mode": "浅色模式", "on": "开", "off": "关", "sign_in": "登录", "sign_up": "注册", "sign_out": "退出登录", "profile": "个人资料", "settings": "设置", "loading_latest": "正在加载最新数据...", "loading_data": "正在加载数据...", "loading": "加载中...", "refresh_t": "刷新", "refresh": "↻ 刷新", "showing_cached": "显示最新数据 · 更新中...", "updated_at": "最后更新：{t}", "updated_short": "更新", "gas_expired": "GAS 链接已过期 -- 请重新部署并更新配置", "gas_down": "GAS 无响应 -- 每 5 分钟重试", "no_news_sheet": "暂无新闻数据 — News 表可能为空", "load_failed": "数据加载失败 — ", "no_news": "暂无新闻数据", "no_data": "暂无数据", "all": "全部", "sec_featured": "精选", "view_all": "查看全部 →", "view_all_n": "查看全部（{n}）→", "collapse": "收起 ↑", "sec_opinion": "观点", "sec_latest": "最新新闻", "sec_most_read": "最多阅读", "sec_prices": "实时行情", "sec_events": "即将举行的活动", "op1": "FTX 的一部分幸存下来，这正是需要 CLARITY 法案的原因", "op2": "自由市场与创新——但仍不完美", "op3": "加密货币或将机构化，但交易仍像传闻", "op_n1": "Randi Abernethy", "op_n2": "Summer Mersinger", "op_n3": "Fabian Dori", "op_i1": "R", "op_i2": "S", "op_i3": "F", "op_d1": "2026年8月7日", "op_d2": "2026年8月6日", "op_d3": "2026年8月5日", "nl_tag": "新闻简报", "nl_desc": "重要加密新闻与每日观点，每天早晨直达您的邮箱", "nl_name_ph": "您的姓名（选填）", "nl_email_ph": "您的邮箱", "nl_btn": "订阅", "nl_note": "订阅即表示您同意", "reg_note": "注册即表示您同意", "terms": "使用条款", "and": "和", "privacy": "隐私政策", "processing": "处理中...", "sending": "发送中...", "subscribed": "已订阅", "no_stock": "暂无股票数据", "updated_dash": "最后更新：—", "view_all_prices": "查看全部行情 →", "loading_prices": "正在加载行情...", "ev_none": "暂无即将举行的活动", "ev_none_region": "该地区暂无活动", "region": "地区", "evr_all": "全部", "evr_eu": "欧洲", "evr_am": "美洲", "evr_as": "亚洲", "evr_sea": "东南亚", "evc_crypto": "🪙 加密货币", "evc_finance": "💵 金融", "evc_gold": "🥇 黄金", "close": "关闭", "share_this": "分享此新闻", "copy": "复制", "copied": "已复制", "share_native": "📲 通过设备应用分享", "share_to": "分享到", "share": "分享", "read_source": "前往来源阅读 →", "read_more": "阅读更多 →", "detail_nobody": "点击“阅读更多”在来源网站查看全文", "video": "视频", "play_video": "播放视频", "view_tiktok": "在 TikTok 观看此视频", "view_origin": "查看原文", "video_notfound": "未找到原视频", "video_unavail": "无法预览此视频", "no_tcc": "TCC 暂无公告", "welcome_back": "欢迎回来", "login_sub": "登录以关注您感兴趣的加密新闻", "email": "邮箱", "err_email": "请输入有效的邮箱", "password": "密码", "err_pass": "请输入密码", "forgot": "忘记密码？", "no_account": "还没有账号？", "signup_free": "免费注册", "create_acct": "创建新账号", "signup_sub": "免费注册，获取个性化加密新闻", "full_name": "姓名", "name_ph": "您的姓名", "err_name": "请输入姓名", "pass_hint": "（至少 6 个字符）", "err_pass_len": "密码至少需要 6 个字符", "confirm_pass": "确认密码", "err_pass_match": "两次密码不一致", "have_account": "已有账号？", "signing_in": "登录中...", "signing_up": "注册中...", "welcome_user": "欢迎，{name}！", "signup_ok": "注册成功！请登录", "generic_err": "出错了，请重试", "bad_login": "邮箱或密码错误", "email_taken": "该邮箱已被使用", "og_desc": "加密货币新闻每 30 分钟更新", "ago_s": "{n} 秒前", "ago_m": "{n} 分钟前", "ago_h": "{n} 小时前", "ago_d": "{n} 天前", "s_s": "{n}秒", "s_m": "{n}分", "s_h": "{n}时", "s_d": "{n}天", "srv_need_creds": "请输入邮箱和密码", "srv_no_account": "未找到该账号", "srv_suspended": "账号已被停用", "srv_bad_password": "密码错误", "srv_incomplete": "信息不完整", "srv_bad_email": "邮箱格式不正确", "srv_email_taken": "该邮箱已注册", "srv_registered": "注册成功", "srv_already_subscribed": "该邮箱已订阅", "srv_resubscribed": "已重新订阅", "srv_subscribed": "订阅成功！请查收邮件", "srv_unsubscribed": "已取消订阅", "srv_auth": "会话已过期，请重新登录"}};
+const I18N_ATTR_OK = ['close','menu','dark_toggle','lang_headline','refresh_t'];
+function _uiLang(){ try{ return currentLang; }catch(e){ return 'en'; } }
+function t(k, v){
+  const L = _uiLang();
+  let s = (I18N[L] && I18N[L][k] != null) ? I18N[L][k] : (I18N.en[k] != null ? I18N.en[k] : k);
+  if (v) s = s.replace(/\{(\w+)\}/g, (m, x) => v[x] != null ? v[x] : m);
+  return s;
+}
+// ข้อความจาก GAS: ใช้ code → แปลตามภาษา | ไม่มี code → ใช้ message ตรงๆ | ไม่มีทั้งคู่ → fallback key
+function srvMsg(res, fb){
+  if (res && res.code && I18N.en['srv_' + res.code]) return t('srv_' + res.code);
+  return (res && res.message) || t(fb);
+}
+let _i18nNodes = null;
+function _i18nScan(){
+  const th2k = {}; const th2kAttr = {};
+  Object.keys(I18N.th).forEach(k => { if (["on", "off", "dark_mode", "light_mode", "updated_short", "load_failed", "copy", "copied", "view_origin"].indexOf(k) < 0) th2k[I18N.th[k]] = k; th2kAttr[I18N.th[k]] = k; });
+  _i18nNodes = { text: [], attr: [], key: [] };
+  document.querySelectorAll('[data-i18n]').forEach(el => _i18nNodes.key.push({ el, k: el.getAttribute('data-i18n') }));
+  const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  let n; while ((n = w.nextNode())) {
+    const p = n.parentNode; if (!p || /^(SCRIPT|STYLE)$/.test(p.nodeName) || (p.closest && (p.closest('[data-i18n]') || p.closest('#drawer-dark-status,#drawer-dark-text')))) continue;
+    const s = n.nodeValue.trim(); if (s && th2k[s]) _i18nNodes.text.push({ n, k: th2k[s], pre: n.nodeValue.match(/^\s*/)[0], post: n.nodeValue.match(/\s*$/)[0] });
+  }
+  document.querySelectorAll('[title],[aria-label],[placeholder]').forEach(el => ['title', 'aria-label', 'placeholder'].forEach(a => {
+    const v = el.getAttribute(a); if (v && th2kAttr[v.trim()] && (a !== 'title' || true)) _i18nNodes.attr.push({ el, a, k: th2kAttr[v.trim()] });
+  }));
+}
+function applyI18n(){
+  if (!_i18nNodes) _i18nScan();
+  _i18nNodes.key.forEach(o => { o.el.textContent = t(o.k); });
+  _i18nNodes.text.forEach(o => { o.n.nodeValue = o.pre + t(o.k) + o.post; });
+  _i18nNodes.attr.forEach(o => o.el.setAttribute(o.a, t(o.k)));
+}
+</script>
 <!-- ═══════════════════════════════════════ -->
 
 <!-- ALERT BAR -->
@@ -1124,17 +1162,17 @@ const IS_LOCAL_FILE = window.location.protocol === 'file:';
     </a>
     <div class="nav-links">
       <div class="nav-item active">
-        <a href="#">ข่าว <span class="nav-chevron">▾</span></a>
+        <a href="#"><span data-i18n="nav_news">News</span> <span class="nav-chevron">▾</span></a>
         <div class="dropdown">
-          <a href="#section-tccnews" style="color:var(--tcc-red);font-weight:700">🔴 ข่าว TCC (TCC News)</a>
-          <a href="#section-markets">ตลาด (Markets)</a>
-          <a href="#section-finance">การเงิน (Finance)</a>
-          <a href="#section-tech">เทคโนโลยี (Tech)</a>
-          <a href="#section-policy">นโยบาย (Policy)</a>
+          <a href="#section-tccnews" style="color:var(--tcc-red);font-weight:700">🔴 <span data-i18n="nav_tcc">TCC News</span></a>
+          <a href="#section-markets"><span data-i18n="cat_markets">Markets</span></a>
+          <a href="#section-finance"><span data-i18n="cat_finance">Finance</span></a>
+          <a href="#section-tech"><span data-i18n="cat_tech">Technology</span></a>
+          <a href="#section-policy"><span data-i18n="cat_policy">Policy</span></a>
         </div>
       </div>
       <div class="nav-item">
-        <a href="#">ราคา <span class="nav-chevron">▾</span></a>
+        <a href="#"><span data-i18n="nav_prices">Prices</span> <span class="nav-chevron">▾</span></a>
         <div class="dropdown">
           <a href="#">Bitcoin (BTC)</a>
           <a href="#">Ethereum (ETH)</a>
@@ -1143,9 +1181,9 @@ const IS_LOCAL_FILE = window.location.protocol === 'file:';
           <a href="#">TCC Token</a>
         </div>
       </div>
-      <div class="nav-item"><a href="#">วิเคราะห์</a></div>
-      <div class="nav-item"><a href="#">วิจัย</a></div>
-      <div class="nav-item"><a href="#">อีเวนต์</a></div>
+      <div class="nav-item"><a href="#"><span data-i18n="nav_analysis">Analysis</span></a></div>
+      <div class="nav-item"><a href="#"><span data-i18n="nav_research">Research</span></a></div>
+      <div class="nav-item"><a href="#"><span data-i18n="nav_events">Events</span></a></div>
     </div>
     <div class="nav-right" id="nav-right">
       <button class="btn-signin" onclick="openModal('login')">เข้าสู่ระบบ</button>
@@ -1157,7 +1195,7 @@ const IS_LOCAL_FILE = window.location.protocol === 'file:';
       <div class="lang-menu" id="lang-menu"></div>
     </div>
     <!-- Dark mode toggle (desktop always visible, mobile visible in nav) -->
-    <button class="dark-toggle" id="dark-toggle-btn" onclick="toggleDarkMode()" title="สลับโหมดมืด/สว่าง" aria-label="Dark mode toggle" style="margin-left:8px">🌙</button>
+    <button class="dark-toggle" id="dark-toggle-btn" onclick="toggleDarkMode()" title="สลับโหมดมืด/สว่าง" aria-label="สลับโหมดมืด/สว่าง" style="margin-left:8px">🌙</button>
     <div class="mob-dark-toggle-wrap" style="display:none"></div>
     <button class="nav-hamburger" id="nav-hamburger" onclick="toggleDrawer()" aria-label="เมนู">
       <span></span><span></span><span></span>
@@ -1177,15 +1215,15 @@ const IS_LOCAL_FILE = window.location.protocol === 'file:';
       <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
     </div>
     <div class="mobile-nav-section">
-      <div class="mobile-nav-section-label">ข่าว</div>
-      <a class="mobile-nav-link highlight" href="#section-tccnews" onclick="closeDrawer()">📣 ข่าว TCC Official</a>
-      <a class="mobile-nav-link" href="#section-markets" onclick="closeDrawer()">ตลาด (Markets)</a>
-      <a class="mobile-nav-link" href="#section-finance" onclick="closeDrawer()">การเงิน (Finance)</a>
-      <a class="mobile-nav-link" href="#section-tech" onclick="closeDrawer()">เทคโนโลยี (Tech)</a>
-      <a class="mobile-nav-link" href="#section-policy" onclick="closeDrawer()">นโยบาย (Policy)</a>
+      <div class="mobile-nav-section-label"><span data-i18n="nav_news">News</span></div>
+      <a class="mobile-nav-link highlight" href="#section-tccnews" onclick="closeDrawer()">📣 <span data-i18n="nav_tcc_m">TCC Official News</span></a>
+      <a class="mobile-nav-link" href="#section-markets" onclick="closeDrawer()"><span data-i18n="cat_markets">Markets</span></a>
+      <a class="mobile-nav-link" href="#section-finance" onclick="closeDrawer()"><span data-i18n="cat_finance">Finance</span></a>
+      <a class="mobile-nav-link" href="#section-tech" onclick="closeDrawer()"><span data-i18n="cat_tech">Technology</span></a>
+      <a class="mobile-nav-link" href="#section-policy" onclick="closeDrawer()"><span data-i18n="cat_policy">Policy</span></a>
     </div>
     <div class="mobile-nav-section">
-      <div class="mobile-nav-section-label">ราคา</div>
+      <div class="mobile-nav-section-label"><span data-i18n="nav_prices">Prices</span></div>
       <a class="mobile-nav-link" href="#" onclick="closeDrawer()">Bitcoin (BTC)</a>
       <a class="mobile-nav-link" href="#" onclick="closeDrawer()">Ethereum (ETH)</a>
       <a class="mobile-nav-link" href="#" onclick="closeDrawer()">XRP</a>
@@ -1193,13 +1231,13 @@ const IS_LOCAL_FILE = window.location.protocol === 'file:';
       <a class="mobile-nav-link" href="#" onclick="closeDrawer()">TCC Token</a>
     </div>
     <div class="mobile-nav-section">
-      <a class="mobile-nav-link" href="#" onclick="closeDrawer()">วิเคราะห์</a>
-      <a class="mobile-nav-link" href="#" onclick="closeDrawer()">วิจัย</a>
-      <a class="mobile-nav-link" href="#" onclick="closeDrawer()">อีเวนต์</a>
+      <a class="mobile-nav-link" href="#" onclick="closeDrawer()"><span data-i18n="nav_analysis">Analysis</span></a>
+      <a class="mobile-nav-link" href="#" onclick="closeDrawer()"><span data-i18n="nav_research">Research</span></a>
+      <a class="mobile-nav-link" href="#" onclick="closeDrawer()"><span data-i18n="nav_events">Events</span></a>
     </div>
     <!-- Language picker ใน drawer (v38) -->
     <div class="drawer-lang">
-      <div class="mobile-nav-section-label" style="padding:0 0 8px">🌐 ภาษาหัวข่าว</div>
+      <div class="mobile-nav-section-label" style="padding:0 0 8px">🌐 <span data-i18n="lang_headline">Headline language</span></div>
       <div class="drawer-lang-grid" id="drawer-lang-grid"></div>
     </div>
     <!-- Dark mode toggle ใน drawer -->
@@ -1631,8 +1669,7 @@ let activeFilter = 'all';
 let refreshTimer = null;
 
 // MONTH MAP (Thai)
-const MONTHS_TH = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-const CAT_MAP   = { markets:'ตลาด', finance:'การเงิน', policy:'นโยบาย', tech:'เทคโนโลยี', business:'ธุรกิจ' };
+const CAT_MAP = new Proxy({}, { get: (_, k) => ['markets','finance','policy','tech','business'].indexOf(k) >= 0 ? t('cat_' + k) : undefined });   // v40: ชื่อหมวดตามภาษา
 
 // ──────────────────────────────────────────────
 //  v38: LANGUAGE — ภาษาของ "หัวข่าว" เท่านั้น (ส่วนอื่นของหน้ายังเป็นไทย)
@@ -1640,6 +1677,7 @@ const CAT_MAP   = { markets:'ตลาด', finance:'การเงิน', pol
 //  iso  = รหัสจริงสำหรับ <html lang> (kh=km, mm=my, la=lo, zh=zh-CN)
 //  ลำดับความสำคัญ: บัญชีสมาชิก → localStorage → ?lang= ในลิงก์ → ภาษาเบราว์เซอร์ → th
 // ──────────────────────────────────────────────
+// v40: ภาษาที่เลือกใช้กับทั้ง UI (เมนู/ปุ่ม/ข้อความ) และหัวข่าว — th/zh แปลครบ, ภาษาอื่นใช้อังกฤษเป็นฐานจนกว่าจะเติมพจนานุกรม
 const LANGS = [
   { code:'th', iso:'th',    label:'ไทย',               font:'' },
   { code:'en', iso:'en',    label:'English',           font:'' },
@@ -1696,7 +1734,7 @@ function renderDetailBody(n) {
   const body = info.isBody ? info.text : escHtml(info.text);
   el.innerHTML = body
     ? `<p>${body.replace(/\n/g, '</p><p>')}</p>`
-    : `<p style="color:var(--gray-400)">คลิก "อ่านต่อ" เพื่อดูเนื้อหาฉบับเต็มที่แหล่งข่าว</p>`;
+    : `<p style="color:var(--gray-400)">${escHtml(t('detail_nobody'))}</p>`;
 }
 
 function detectInitialLang() {
@@ -1749,6 +1787,9 @@ function applyLang(code, rerender) {
   document.documentElement.lang = LANG_BY_CODE[code].iso;
   loadLangFont(code);
   renderLangUI();
+  applyI18n();   // v40: แปลเมนู/ข้อความ UI ทั้งหน้าตามภาษา
+  applyDarkMode(document.documentElement.getAttribute('data-theme') === 'dark', false);
+  if (typeof renderAuthState === 'function' && typeof currentUser !== 'undefined') { try { renderAuthState(); } catch (e) {} }
   if (!rerender) return;
   if (allNews.length) renderAll();
   if (allTCCNews.length) renderTCCNews();
@@ -1912,7 +1953,7 @@ function hydrateFromCache() {
       allNews.forEach(x => { if (x.url && x.url !== '#') _urlToId[x.url] = x.id; });
       renderAll();
       updateAlertBar();
-      setStatus('live', 'แสดงข้อมูลล่าสุด · กำลังอัปเดต...');
+      setStatus('live', t('showing_cached'));
     }
     const ev = lsGet('events2');
     if (ev && ev.d && Array.isArray(ev.d.events) && ev.d.events.length) { _hydrated['events2'] = true; renderEvents(ev.d.events); }
@@ -1939,7 +1980,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // v39: แบ่ง 2 สาย ทำงานพร้อมกัน (ไม่เกิน 2 request ต่อ GAS ในเวลาเดียวกัน): ข่าว | ราคา+อีเวนต์
 async function refreshAll(force = true) {
   if (force === undefined || force === null || typeof force === 'object') force = true;   // onclick ส่ง event มา
-  if (!allNews.length) setStatus('loading', 'กำลังโหลดข้อมูล...');
+  if (!allNews.length) setStatus('loading', t('loading_data'));
   await Promise.all([
     (async () => {
       await fetchTCCNews(force);
@@ -2013,7 +2054,7 @@ async function fetchGAS(action, params = {}) {
         if (!_gasIs404) {
           _gasIs404 = true;
           console.error('[TCCReport] GAS 404 -- URL หมดอายุ กรุณา redeploy GAS แล้วอัปเดต GAS_URL ใน index.html บรรทัด 1001');
-          setStatus('error', 'GAS URL หมดอายุ -- redeploy GAS แล้วอัปเดต URL ใน config');
+          setStatus('error', t('gas_expired'));
         }
         break; // ไม่ retry
       }
@@ -2042,7 +2083,7 @@ async function fetchGAS(action, params = {}) {
   if (action === 'news') {
     const dot = document.getElementById('status-dot');
     if (dot && !dot.classList.contains('error') && !_gasIs404) {
-      setStatus('error', 'GAS ไม่ตอบสนอง -- retry ทุก 5 นาที');
+      setStatus('error', t('gas_down'));
     }
   }
   return getMockData(action);
@@ -2132,15 +2173,15 @@ async function fetchNews(force = true) {
     }, { force: force, freshMs: 120000, stale: () => _newsLoadedLang !== lang, valid: d => d && Array.isArray(d.news) && d.news.length > 0 });
     updateNewsStatus();
     if (!allNews.length && data && Array.isArray(data.news) && !IS_LOCAL_FILE) {
-      setStatus('error', 'ไม่มีข้อมูลข่าว — Sheet News อาจว่างเปล่า');
+      setStatus('error', t('no_news_sheet'));
     }
   } catch (e) {
-    if (!IS_LOCAL_FILE) setStatus('error', 'โหลดข้อมูลไม่สำเร็จ — ' + e.message);
+    if (!IS_LOCAL_FILE) setStatus('error', t('load_failed') + e.message);
     console.error('fetchNews error:', e);
   }
 }
 function updateNewsStatus() {
-  if (!IS_LOCAL_FILE && allNews.length) setStatus('live', `อัปเดตล่าสุด: ${formatTime(new Date())}`);
+  if (!IS_LOCAL_FILE && allNews.length) setStatus('live', t('updated_at', { t: formatTime(new Date()) }));
 }
 
 // ──────────────────────────────────────────────
@@ -2329,7 +2370,7 @@ function renderAll() {
 function renderHero(news) {
   if (!news.length) {
     document.getElementById('hero-cat').textContent = '';
-    document.getElementById('hero-title').innerHTML = '<span style="color:var(--gray-400);font-size:15px">ไม่มีข้อมูลข่าว</span>';
+    document.getElementById('hero-title').innerHTML = '<span style="color:var(--gray-400);font-size:15px">' + t('no_news') + '</span>';
     const iw = document.getElementById('hero-img');
     iw.className = 'hero-img-wrap'; iw.innerHTML = '';
     document.getElementById('hero-excerpt').textContent = '';
@@ -2337,7 +2378,7 @@ function renderHero(news) {
   }
   const n = news[0];
 
-  document.getElementById('hero-cat').textContent = CAT_MAP[n.category] || n.category || 'ข่าว';
+  document.getElementById('hero-cat').textContent = CAT_MAP[n.category] || n.category || t('cat_news');
 
   const titleEl = document.getElementById('hero-title');
   titleEl.innerHTML = `<a href="${n.url}" target="_blank" rel="noopener">${newsTitle(n)}</a>`;
@@ -2368,7 +2409,7 @@ function renderHero(news) {
   const tagsEl = document.getElementById('hero-tags');
   const tags = (n.asset_tags || []).map(t => `<span class="asset-tag">${t}</span>`).join('');
   tagsEl.innerHTML = tags
-    + `<a href="${n.url}" target="_blank" rel="noopener" style="font-size:13px;font-weight:700;border-bottom:1px solid #000;margin-left:4px">อ่านต่อ →</a>`
+    + `<a href="${n.url}" target="_blank" rel="noopener" style="font-size:13px;font-weight:700;border-bottom:1px solid #000;margin-left:4px">${escHtml(t('read_more'))}</a>`
     + shareBtnHtml(n.id, newsTitle(n), n.url, true, n.image_url || '');
 }
 
@@ -2432,7 +2473,7 @@ function renderFeaturedGrid(news, isFiltered) {
     // tab all: เหมือนเดิม ข้าม hero (0) + thumb (1-4) = เริ่มที่ 5
     items = news.slice(5, 8);
   }
-  if (!items.length) { grid.innerHTML = '<div class="empty-state"><p>ไม่มีข้อมูล</p></div>'; return; }
+  if (!items.length) { grid.innerHTML = '<div class="empty-state"><p>' + t('no_data') + '</p></div>'; return; }
 
   grid.innerHTML = items.map(n => `
     <div class="feature-card">
@@ -2564,7 +2605,7 @@ function parseVideoUrl(url) {
 
   // ── Generic embed URL (/embed/ หรือ /player/ ใน URL) ──
   if (/\/embed\/|\/player\//i.test(u) && /^https?:\/\//i.test(u)) {
-    return { embed: u, platform: 'oth', orient: 'landscape', label: 'วิดีโอ' };
+    return { embed: u, platform: 'oth', orient: 'landscape', label: t('video') };
   }
 
   return null; // ไม่ใช่ video URL ที่รองรับ
@@ -2599,7 +2640,7 @@ function buildVideoHtml(v, newsId, extraClass = '') {
   _videoMetaStore[newsId] = v;
   return `<div class="vid-wrap vid-cover ${extraClass}" data-orient="${v.orient}" data-vid-id="${newsId}" onclick="playTccVideo('${newsId}', this)">
     <div class="vid-thumb" style="${thumbBg}"></div>
-    <button class="vid-play-btn" type="button" aria-label="เล่นวิดีโอ" onclick="event.stopPropagation();playTccVideo('${newsId}', this.closest('.vid-wrap'))">
+    <button class="vid-play-btn" type="button" aria-label="${t('play_video')}" onclick="event.stopPropagation();playTccVideo('${newsId}', this.closest('.vid-wrap'))">
       <svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
     </button>
     <span class="vid-platform ${badgeCls}">${v.label}</span>
@@ -2631,7 +2672,7 @@ function playTccVideo(newsId, wrapEl) {
       <blockquote class="tiktok-embed" cite="${v.originalUrl}" data-video-id="${v.ttId}"
         style="max-width:100%;min-width:100%;height:100%;margin:0">
         <section>
-          <a class="tt-fallback-link" target="_blank" rel="noopener" href="${v.originalUrl}">▶ ดูวิดีโอนี้ใน TikTok</a>
+          <a class="tt-fallback-link" target="_blank" rel="noopener" href="${v.originalUrl}">▶ ${t('view_tiktok')}</a>
         </section>
       </blockquote>
       <span class="vid-platform ${badgeCls}">${v.label}</span>`;
@@ -2674,11 +2715,11 @@ function loadTikTokEmbedScript() {
 function videoFallbackHtml(v, originalUrl, extraClass = '') {
   const badgeCls = v.platform || 'oth';
   const linkHtml = (originalUrl && originalUrl !== '#')
-    ? `<a href="${originalUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()">ดูที่ต้นทาง ↗</a>`
-    : `<p>ไม่พบวิดีโอต้นฉบับ</p>`;
+    ? `<a href="${originalUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${t('view_origin')} ↗</a>`
+    : `<p>${t('video_notfound')}</p>`;
   return `<div class="vid-wrap ${extraClass}" data-orient="${v.orient}">
     <div class="vid-fallback">
-      <p>ไม่สามารถแสดงตัวอย่างวิดีโอนี้ได้</p>
+      <p>${t('video_unavail')}</p>
       ${linkHtml}
     </div>
     <span class="vid-platform ${badgeCls}">${v.label}</span>
@@ -2696,8 +2737,8 @@ function renderTCCNews() {
     gridEl.innerHTML = `
       <div class="tcc-empty" style="grid-column:1/-1">
         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V4a2 2 0 10-4 0v1.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-        <p>ยังไม่มีข่าวประกาศจาก TCC</p>
-        <p style="font-size:11px;margin-top:4px">admin โพสต์ได้ที่ Sheet <b>TCCNews</b></p>
+        <p>${t('no_tcc')}</p>
+        <p style="font-size:11px;margin-top:4px">Admins can post in the <b>TCCNews</b> sheet</p>
       </div>`;
     listEl.style.display = 'none';
     return;
@@ -2741,7 +2782,7 @@ function renderTCCNews() {
       <div class="${cardCls}">
         ${mediaHtml}
         <div class="tcc-card-body">
-          <div class="tcc-card-cat">${CAT_MAP[n.category] || n.category || 'ประกาศ'}</div>
+          <div class="tcc-card-cat">${CAT_MAP[n.category] || n.category || t('cat_announce')}</div>
           <div class="tcc-card-title">
             <a href="#" onclick="event.preventDefault();openNewsDetail('${n.id}')">${newsTitle(n)}</a>
           </div>
@@ -2903,7 +2944,7 @@ function renderMostRead(news) {
 function renderPrices() {
   const el = document.getElementById('price-rows-crypto');
   if (!allPrices.length) {
-    el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--gray-400);font-size:13px">กำลังโหลดราคา...</div>';
+    el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--gray-400);font-size:13px">' + t('loading_prices') + '</div>';
     return;
   }
 
@@ -2922,7 +2963,7 @@ function renderPrices() {
 
   const latest = allPrices[0];
   if (latest && latest.updated_at) {
-    document.getElementById('price-update').textContent = 'อัปเดต: ' + formatTime(new Date(latest.updated_at));
+    document.getElementById('price-update').textContent = t('updated_short') + ': ' + formatTime(new Date(latest.updated_at));
   }
 }
 
@@ -2975,14 +3016,8 @@ function renderTicker() {
 //  v39: อีเวนต์/งานสัมมนา แยกภูมิภาค (ยุโรป · อเมริกา · เอเชีย · SEA) + หมวด คริปโต/การเงิน/ทองคำ
 //  ข้อมูลมาจาก Sheet "Events" (GAS: seedEventsV31 + fetchAllEvents) -- date/end_date เป็น 'yyyy-MM-dd' (วันที่ล้วน)
 // ──────────────────────────────────────────────
-const EVENT_REGION_TABS = [
-  { key: 'all', label: 'ทั้งหมด' },
-  { key: 'eu',  label: 'ยุโรป' },
-  { key: 'am',  label: 'อเมริกา' },
-  { key: 'as',  label: 'เอเชีย' },
-  { key: 'sea', label: 'เอเชียตะวันออกเฉียงใต้' },
-];
-const EVENT_CAT_LABEL = { crypto: '🪙 คริปโต', finance: '💵 การเงิน', gold: '🥇 ทองคำ' };
+const EVENT_REGION_TABS = ['all','eu','am','as','sea'].map(k => ({ key: k, get label() { return t('evr_' + k); } }));
+const EVENT_CAT_LABEL = { get crypto() { return t('evc_crypto'); }, get finance() { return t('evc_finance'); }, get gold() { return t('evc_gold'); } };
 const EVENT_COLLAPSED_N = 5;      // แสดงก่อน N รายการ (กด "ดูทั้งหมด" เพื่อขยาย)
 let _allEvents = [];
 let _eventRegion = 'all';
@@ -3027,14 +3062,14 @@ function renderEvents(events) {
   const list = _allEvents.filter(ev => _eventRegion === 'all' || ev.region === _eventRegion);
   const toggle = document.getElementById('events-toggle');
   if (!list.length) {
-    el.innerHTML = `<div class="empty-state" style="padding:20px 0"><p>ยังไม่มีอีเวนต์ในภูมิภาคนี้</p></div>`;
+    el.innerHTML = `<div class="empty-state" style="padding:20px 0"><p>${t('ev_none_region')}</p></div>`;
     if (toggle) toggle.style.display = 'none';
     return;
   }
   const shown = _eventsExpanded ? list : list.slice(0, EVENT_COLLAPSED_N);
   if (toggle) {
     toggle.style.display = list.length > EVENT_COLLAPSED_N ? '' : 'none';
-    toggle.textContent = _eventsExpanded ? 'ย่อ ↑' : `ดูทั้งหมด (${list.length}) →`;
+    toggle.textContent = _eventsExpanded ? t('collapse') : t('view_all_n', { n: list.length });
   }
 
   el.innerHTML = shown.map(ev => {
@@ -3111,31 +3146,31 @@ async function subscribeNewsletter() {
 
   // Validate
   if (!email || !email.includes('@')) {
-    _nlMsg('error', '⚠️ กรุณาระบุอีเมลที่ถูกต้อง');
+    _nlMsg('error', '⚠️ ' + t('err_email'));
     return;
   }
 
   // Loading state
   btn.disabled    = true;
-  btn.textContent = 'กำลังดำเนินการ...';
-  _nlMsg('info', '⏳ กำลังส่งข้อมูล...');
+  btn.textContent = t('processing');
+  _nlMsg('info', '⏳ ' + t('sending'));
 
   try {
     const res = await fetchGAS('subscribe', { email, name });
     if (res && res.success) {
-      _nlMsg('success', '✅ ' + (res.message || 'สมัครรับข่าวสารสำเร็จ! กรุณาตรวจสอบอีเมลของคุณ'));
+      _nlMsg('success', '✅ ' + srvMsg(res, 'srv_subscribed'));
       emailEl.value = '';
       if (nameEl) nameEl.value = '';
-      btn.textContent = '✓ สมัครแล้ว';
+      btn.textContent = '✓ ' + t('subscribed');
     } else {
-      _nlMsg('error', '❌ ' + (res?.message || 'เกิดข้อผิดพลาด กรุณาลองใหม่'));
+      _nlMsg('error', '❌ ' + srvMsg(res, 'generic_err'));
       btn.disabled    = false;
-      btn.textContent = 'สมัครรับข่าวสาร';
+      btn.textContent = t('nl_btn');
     }
   } catch(e) {
-    _nlMsg('error', '❌ เกิดข้อผิดพลาด กรุณาลองใหม่');
+    _nlMsg('error', '❌ ' + t('generic_err'));
     btn.disabled    = false;
-    btn.textContent = 'สมัครรับข่าวสาร';
+    btn.textContent = t('nl_btn');
   }
 }
 
@@ -3153,22 +3188,22 @@ function _nlMsg(type, text) {
 // ──────────────────────────────────────────────
 function timeAgo(iso) {
   const diff = (Date.now() - new Date(iso).getTime()) / 1000;
-  if (diff < 60)          return `${Math.floor(diff)} วินาทีที่แล้ว`;
-  if (diff < 3600)        return `${Math.floor(diff/60)} นาทีที่แล้ว`;
-  if (diff < 86400)       return `${Math.floor(diff/3600)} ชั่วโมงที่แล้ว`;
-  return `${Math.floor(diff/86400)} วันที่แล้ว`;
+  if (diff < 60)    return t('ago_s', { n: Math.floor(diff) });
+  if (diff < 3600)  return t('ago_m', { n: Math.floor(diff/60) });
+  if (diff < 86400) return t('ago_h', { n: Math.floor(diff/3600) });
+  return t('ago_d', { n: Math.floor(diff/86400) });
 }
 
 function timeAgoShort(iso) {
   const diff = (Date.now() - new Date(iso).getTime()) / 1000;
-  if (diff < 60)    return `${Math.floor(diff)}ว.`;
-  if (diff < 3600)  return `${Math.floor(diff/60)} นาที`;
-  if (diff < 86400) return `${Math.floor(diff/3600)} ชม.`;
-  return `${Math.floor(diff/86400)} วัน`;
+  if (diff < 60)    return t('s_s', { n: Math.floor(diff) });
+  if (diff < 3600)  return t('s_m', { n: Math.floor(diff/60) });
+  if (diff < 86400) return t('s_h', { n: Math.floor(diff/3600) });
+  return t('s_d', { n: Math.floor(diff/86400) });
 }
 
 function formatTime(d) {
-  return d.toLocaleTimeString('th-TH', { hour:'2-digit', minute:'2-digit' });
+  return d.toLocaleTimeString((LANG_BY_CODE[currentLang] || {}).iso || 'th', { hour:'2-digit', minute:'2-digit' });
 }
 
 function sentimentLabel(s) {
@@ -3312,7 +3347,7 @@ function openShareModal(newsId, title, origUrl, imageUrl) {
   _renderShareImage(_shareImageUrl);
 
   const copyBtn = document.getElementById('btn-copy');
-  copyBtn.textContent = 'คัดลอก';
+  copyBtn.textContent = t('copy');
   copyBtn.classList.remove('copied');
 
   document.getElementById('share-overlay').classList.add('open');
@@ -3365,9 +3400,9 @@ async function copyShareLink() {
     document.execCommand('copy');
     document.body.removeChild(ta);
   }
-  btn.textContent = '✓ คัดลอกแล้ว';
+  btn.textContent = '✓ ' + t('copied');
   btn.classList.add('copied');
-  setTimeout(() => { btn.textContent = 'คัดลอก'; btn.classList.remove('copied'); }, 2200);
+  setTimeout(() => { btn.textContent = t('copy'); btn.classList.remove('copied'); }, 2200);
 }
 
 // ── Social Share ──
@@ -3415,10 +3450,10 @@ function shareBtnHtml(newsId, title, url, lg = false, imageUrl = '') {
     data-url="${safeUrl}"
     data-img="${safeImg}"
     onclick="event.stopPropagation();(function(b){openShareModal(b.dataset.nid,b.dataset.ttl,b.dataset.url,b.dataset.img)})(this)"
-    title="แชร์ข่าวนี้">
+    title="${t('share_this')}">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
       <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/>
-    </svg>แชร์
+    </svg>${t('share')}
   </button>`;
 }
 
@@ -3465,7 +3500,7 @@ function _renderNewsDetail(n) {
     imgEl.style.display = 'none';
   }
 
-  document.getElementById('nd-cat').textContent   = CAT_MAP[n.category] || n.category || 'ข่าว';
+  document.getElementById('nd-cat').textContent   = CAT_MAP[n.category] || n.category || t('cat_news');
   document.getElementById('nd-title').textContent = newsTitle(n) || '';
   document.getElementById('nd-meta').innerHTML    = `
     <span>${n.source || 'TCC'}</span><span>·</span>
@@ -3496,7 +3531,7 @@ function _renderNewsDetail(n) {
   // ทำให้ preview ถูกต้องเมื่อ copy URL ไปวางใน Telegram / LINE / Discord
   // (บอทที่ fetch ลิงก์แชร์จะได้ OG จาก Cloudflare Worker /n/<id> — ฟังก์ชันนี้อัปเดตไว้ให้ JS-capable crawler / แท็บเบราว์เซอร์)
   _updateOgMeta(newsTitle(n) || 'TCC Financial Reports',
-                newsExcerpt(n).slice(0, 200) || 'ข่าว Crypto อัปเดตทุก 30 นาที',
+                newsExcerpt(n).slice(0, 200) || t('og_desc'),
                 n.image_url || '',
                 deepUrl);
 }
@@ -3603,7 +3638,7 @@ async function doLogin() {
 
   const btn = document.getElementById('btn-login');
   btn.disabled = true;
-  btn.textContent = 'กำลังเข้าสู่ระบบ...';
+  btn.textContent = t('signing_in');
   clearAuthMsg();
 
   try {
@@ -3625,16 +3660,16 @@ async function doLogin() {
         saveLangToAccount(_hadLocalLang);
       }
       renderAuthState();
-      showAuthMsg('success', `✅ ยินดีต้อนรับ ${currentUser.name}!`);
+      showAuthMsg('success', '✅ ' + t('welcome_user', { name: currentUser.name }));
       setTimeout(closeModal, 1200);
     } else {
-      showAuthMsg('error', res?.message || '❌ อีเมลหรือรหัสผ่านไม่ถูกต้อง');
+      showAuthMsg('error', '❌ ' + srvMsg(res, 'bad_login'));
     }
   } catch(e) {
-    showAuthMsg('error', '❌ เกิดข้อผิดพลาด กรุณาลองใหม่');
+    showAuthMsg('error', '❌ ' + t('generic_err'));
   } finally {
     btn.disabled = false;
-    btn.textContent = 'เข้าสู่ระบบ';
+    btn.textContent = t('sign_in');
   }
 }
 
@@ -3656,22 +3691,22 @@ async function doRegister() {
 
   const btn = document.getElementById('btn-register');
   btn.disabled = true;
-  btn.textContent = 'กำลังสมัครสมาชิก...';
+  btn.textContent = t('signing_up');
   clearAuthMsg();
 
   try {
     const res = await fetchGAS('register', { name, email, pass: btoa(pass) });
     if (res && res.success) {
-      showAuthMsg('success', '✅ สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ');
+      showAuthMsg('success', '✅ ' + t('signup_ok'));
       setTimeout(() => switchTab('login'), 1500);
     } else {
-      showAuthMsg('error', res?.message || '❌ อีเมลนี้ถูกใช้งานแล้ว');
+      showAuthMsg('error', '❌ ' + srvMsg(res, 'email_taken'));
     }
   } catch(e) {
-    showAuthMsg('error', '❌ เกิดข้อผิดพลาด กรุณาลองใหม่');
+    showAuthMsg('error', '❌ ' + t('generic_err'));
   } finally {
     btn.disabled = false;
-    btn.textContent = 'สมัครสมาชิก';
+    btn.textContent = t('sign_up');
   }
 }
 
@@ -3708,16 +3743,16 @@ function renderAuthState() {
             <div style="font-size:13px;font-weight:600">${currentUser.name}</div>
             <div style="font-size:11px;color:var(--gray-400)">${currentUser.email}</div>
           </div>
-          <button class="user-dd-item" onclick="closeUserMenu()">👤 โปรไฟล์</button>
-          <button class="user-dd-item" onclick="closeUserMenu()">⚙️ ตั้งค่า</button>
-          <button class="user-dd-item danger" onclick="doLogout()">🚪 ออกจากระบบ</button>
+          <button class="user-dd-item" onclick="closeUserMenu()">👤 ${t('profile')}</button>
+          <button class="user-dd-item" onclick="closeUserMenu()">⚙️ ${t('settings')}</button>
+          <button class="user-dd-item danger" onclick="doLogout()">🚪 ${t('sign_out')}</button>
         </div>
       </div>
     `;
   } else {
     navRight.innerHTML = `
-      <button class="btn-signin" onclick="openModal('login')">เข้าสู่ระบบ</button>
-      <button class="btn-signup" onclick="openModal('register')">สมัครสมาชิก</button>
+      <button class="btn-signin" onclick="openModal('login')">${t('sign_in')}</button>
+      <button class="btn-signup" onclick="openModal('register')">${t('sign_up')}</button>
     `;
   }
 }
@@ -3763,8 +3798,8 @@ function applyDarkMode(isDark, save) {
   const status = document.getElementById('drawer-dark-status');
   if (btn)    btn.textContent = isDark ? '☀️' : '🌙';
   if (icon)   icon.textContent = isDark ? '☀️' : '🌙';
-  if (text)   text.textContent = isDark ? 'โหมดสว่าง' : 'โหมดมืด';
-  if (status) status.textContent = isDark ? 'เปิด' : 'ปิด';
+  if (text)   text.textContent = isDark ? t('light_mode') : t('dark_mode');
+  if (status) status.textContent = isDark ? t('on') : t('off');
   if (save)   localStorage.setItem('tcc_theme', isDark ? 'dark' : 'light');
 }
 
@@ -3809,12 +3844,12 @@ renderAuthState = function() {
           <div style="font-size:11px;color:var(--gray-400)">${currentUser.email}</div>
         </div>
       </div>
-      <button class="btn-signin" style="width:100%;padding:10px" onclick="closeDrawer();doLogout()">🚪 ออกจากระบบ</button>
+      <button class="btn-signin" style="width:100%;padding:10px" onclick="closeDrawer();doLogout()">🚪 ${t('sign_out')}</button>
     `;
   } else {
     mobileAuth.innerHTML = `
-      <button class="btn-signup" style="width:100%;padding:10px" onclick="closeDrawer();openModal('login')">เข้าสู่ระบบ</button>
-      <button class="btn-signin" style="width:100%;padding:10px" onclick="closeDrawer();openModal('register')">สมัครสมาชิก</button>
+      <button class="btn-signup" style="width:100%;padding:10px" onclick="closeDrawer();openModal('login')">${t('sign_in')}</button>
+      <button class="btn-signin" style="width:100%;padding:10px" onclick="closeDrawer();openModal('register')">${t('sign_up')}</button>
     `;
   }
 };
