@@ -131,6 +131,11 @@ button{cursor:pointer;font-family:inherit}
 [data-theme="dark"] .prices-more:hover{color:#f0f0f0}
 [data-theme="dark"] .event-item{border-bottom-color:#242424}
 [data-theme="dark"] .event-date{background:#f0f0f0;color:#000}
+[data-theme="dark"] .ev-tab{border-color:#333}
+[data-theme="dark"] .ev-tab.active{background:#f0f0f0;color:#000;border-color:#f0f0f0}
+[data-theme="dark"] .ev-cat{background:#242424;color:#eee}
+[data-theme="dark"] .ev-cat.crypto{background:#3a2f10;color:#ffd978}[data-theme="dark"] .ev-cat.finance{background:#14283f;color:#9cc4ff}[data-theme="dark"] .ev-cat.gold{background:#3b2c0a;color:#ffcf6b}
+[data-theme="dark"] .ev-more{border-color:#333}
 [data-theme="dark"] .tcc-news-section{border-top-color:#e62e2e}
 [data-theme="dark"] .tcc-card{border-color:#333;background:#1a1a1a}
 [data-theme="dark"] .tcc-card:hover{border-color:#e62e2e}
@@ -378,6 +383,16 @@ html[lang="zh-CN"] body,html[lang="zh-CN"] button,html[lang="zh-CN"] input{font-
 .event-title{font-size:13px;font-weight:600;line-height:1.4;color:var(--black)}
 .event-title:hover{text-decoration:underline}
 .event-loc{font-size:11px;color:var(--gray-400);margin-top:4px}
+.ev-tabs{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 6px}
+.ev-tab{font-size:11px;font-weight:600;padding:4px 10px;border:1px solid var(--gray-200,#ddd);border-radius:999px;background:transparent;color:var(--black);cursor:pointer;line-height:1.4}
+.ev-tab:hover{border-color:var(--black)}
+.ev-tab.active{background:var(--black);color:#fff;border-color:var(--black)}
+.ev-tab .ev-n{opacity:.6;margin-left:3px;font-weight:500}
+.ev-cat{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.02em;padding:1px 6px;border-radius:3px;margin-right:6px;vertical-align:1px;background:var(--gray-100);color:var(--black)}
+.ev-cat.crypto{background:#fff4d6;color:#7a5200}.ev-cat.finance{background:#e4efff;color:#1d4f9c}.ev-cat.gold{background:#fdecc8;color:#8a5a00}
+.ev-range{font-size:11px;color:var(--gray-400);margin-top:3px}
+.ev-more{display:block;width:100%;margin-top:8px;font-size:12px;font-weight:600;padding:7px;border:1px solid var(--gray-200,#ddd);border-radius:4px;background:transparent;color:var(--black);cursor:pointer}
+.ev-more:hover{border-color:var(--black)}
 
 /* ─── NEWSLETTER ─── */
 .newsletter{background:var(--black);color:#fff;padding:32px;margin:32px 0;border-radius:4px}
@@ -1420,7 +1435,8 @@ const IS_LOCAL_FILE = window.location.protocol === 'file:';
 
   <!-- EVENTS -->
   <div style="margin-bottom:24px">
-    <div class="sec-header"><span class="sec-title">อีเวนต์ที่กำลังจะมาถึง</span><a href="#" class="sec-more">ดูทั้งหมด →</a></div>
+    <div class="sec-header"><span class="sec-title">อีเวนต์ที่กำลังจะมาถึง</span><a href="#" class="sec-more" id="events-toggle" onclick="toggleEventsExpand(event)">ดูทั้งหมด →</a></div>
+    <div class="ev-tabs" id="ev-tabs" role="tablist" aria-label="ภูมิภาค"></div>
     <div id="events-list">
       <!-- v38: ลบรายการ static ที่ล้าสมัยแล้ว — อีเวนต์จริงมาจาก Sheet "Events" (renderEvents แทนที่กล่องนี้) -->
       <div class="empty-state" style="padding:20px 0"><p>ยังไม่มีอีเวนต์ที่กำลังจะมาถึง</p></div>
@@ -1739,6 +1755,7 @@ function applyLang(code, rerender) {
   updateAlertBar();
   // v39: list ส่งมาเฉพาะภาษาที่ขอ → สลับภาษาแล้วโหลดชุดของภาษาใหม่ (แสดงแคชของภาษานั้นทันทีถ้าเคยเปิด)
   fetchTCCNews(false); fetchNews(false);
+  if (_allEvents.length) renderEvents();   // v39: ชื่อเดือน/วันที่ของอีเวนต์ตามภาษา
   if (_detailNewsId && _detailNewsObj) {
     const t = document.getElementById('nd-title');
     if (t) t.textContent = newsTitle(_detailNewsObj);
@@ -1897,8 +1914,8 @@ function hydrateFromCache() {
       updateAlertBar();
       setStatus('live', 'แสดงข้อมูลล่าสุด · กำลังอัปเดต...');
     }
-    const ev = lsGet('events');
-    if (ev && ev.d && Array.isArray(ev.d.events) && ev.d.events.length) { _hydrated['events'] = true; renderEvents(ev.d.events); }
+    const ev = lsGet('events2');
+    if (ev && ev.d && Array.isArray(ev.d.events) && ev.d.events.length) { _hydrated['events2'] = true; renderEvents(ev.d.events); }
     const mr = lsGet('mostread');
     if (mr && mr.d && Array.isArray(mr.d.items)) { _hydrated['mostread'] = true; _mostRead = mr.d.items; renderMostRead(getFilteredNews()); }
   } catch (e) { console.warn('[cache] hydrate failed', e); }
@@ -2263,9 +2280,9 @@ async function fetchPrices() {
 // ──────────────────────────────────────────────
 async function fetchEvents(force = true) {
   try {
-    await swrLoad('events', 'events', {}, (d, info) => {
+    await swrLoad('events2', 'events', {}, (d, info) => {
       if (info.same) return;
-      if (d.events && d.events.length > 0) renderEvents(d.events);
+      if (d.events && d.events.length > 0) renderEvents(d.events);   // v39: เก็บไว้ใน _allEvents เพื่อสลับแท็บภูมิภาค/ภาษา
     }, { force: force, freshMs: 600000, valid: d => d && Array.isArray(d.events) && d.events.length > 0 });
   } catch (e) {
     console.error('fetchEvents error:', e);
@@ -2954,23 +2971,108 @@ function renderTicker() {
 // ──────────────────────────────────────────────
 //  EVENTS
 // ──────────────────────────────────────────────
+// ──────────────────────────────────────────────
+//  v39: อีเวนต์/งานสัมมนา แยกภูมิภาค (ยุโรป · อเมริกา · เอเชีย · SEA) + หมวด คริปโต/การเงิน/ทองคำ
+//  ข้อมูลมาจาก Sheet "Events" (GAS: seedEventsV31 + fetchAllEvents) -- date/end_date เป็น 'yyyy-MM-dd' (วันที่ล้วน)
+// ──────────────────────────────────────────────
+const EVENT_REGION_TABS = [
+  { key: 'all', label: 'ทั้งหมด' },
+  { key: 'eu',  label: 'ยุโรป' },
+  { key: 'am',  label: 'อเมริกา' },
+  { key: 'as',  label: 'เอเชีย' },
+  { key: 'sea', label: 'เอเชียตะวันออกเฉียงใต้' },
+];
+const EVENT_CAT_LABEL = { crypto: '🪙 คริปโต', finance: '💵 การเงิน', gold: '🥇 ทองคำ' };
+const EVENT_COLLAPSED_N = 5;      // แสดงก่อน N รายการ (กด "ดูทั้งหมด" เพื่อขยาย)
+let _allEvents = [];
+let _eventRegion = 'all';
+let _eventsExpanded = false;
+
+function _evParse(ymd) {          // 'yyyy-MM-dd' -> Date (เวลาท้องถิ่น ไม่เลื่อนวันตามเขตเวลา)
+  const m = String(ymd || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+  return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null;
+}
+function _evSafeUrl(u) {
+  u = String(u || '').trim();
+  return /^https?:\/\//i.test(u) ? u : '';
+}
+function _evRange(ev, locale) {
+  const a = _evParse(ev.date), b = _evParse(ev.end_date);
+  if (!a) return '';
+  const full = (d) => d.toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' });
+  if (!b || +b === +a) return full(a);
+  if (a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth())
+    return a.getDate() + '–' + b.getDate() + ' ' + a.toLocaleDateString(locale, { month: 'short', year: 'numeric' });
+  return full(a) + ' – ' + full(b);
+}
+
 function renderEvents(events) {
+  if (Array.isArray(events)) _allEvents = events;
   const el = document.getElementById('events-list');
-  el.innerHTML = events.map(ev => {
-    const d = new Date(ev.date);
+  const tabsEl = document.getElementById('ev-tabs');
+  if (!el) return;
+  const locale = (LANG_BY_CODE[currentLang] || {}).iso || 'th';
+  const month = (d) => d.toLocaleDateString(locale, { month: 'short' });
+
+  // แท็บภูมิภาค (แสดงจำนวนต่อภูมิภาค; ซ่อนภูมิภาคที่ไม่มีรายการ ยกเว้นที่กำลังเลือกอยู่)
+  const counts = { all: _allEvents.length };
+  _allEvents.forEach(ev => { counts[ev.region] = (counts[ev.region] || 0) + 1; });
+  if (tabsEl) {
+    tabsEl.innerHTML = EVENT_REGION_TABS
+      .filter(t => t.key === 'all' || counts[t.key] || t.key === _eventRegion)
+      .map(t => `<button type="button" class="ev-tab${t.key === _eventRegion ? ' active' : ''}" role="tab" aria-selected="${t.key === _eventRegion}" data-region="${t.key}">${t.label}<span class="ev-n">${counts[t.key] || 0}</span></button>`)
+      .join('');
+  }
+
+  const list = _allEvents.filter(ev => _eventRegion === 'all' || ev.region === _eventRegion);
+  const toggle = document.getElementById('events-toggle');
+  if (!list.length) {
+    el.innerHTML = `<div class="empty-state" style="padding:20px 0"><p>ยังไม่มีอีเวนต์ในภูมิภาคนี้</p></div>`;
+    if (toggle) toggle.style.display = 'none';
+    return;
+  }
+  const shown = _eventsExpanded ? list : list.slice(0, EVENT_COLLAPSED_N);
+  if (toggle) {
+    toggle.style.display = list.length > EVENT_COLLAPSED_N ? '' : 'none';
+    toggle.textContent = _eventsExpanded ? 'ย่อ ↑' : `ดูทั้งหมด (${list.length}) →`;
+  }
+
+  el.innerHTML = shown.map(ev => {
+    const d = _evParse(ev.date);
+    if (!d) return '';
+    const url = _evSafeUrl(ev.url);
+    const title = escHtml(ev.title || '');
+    const titleHtml = url
+      ? `<a class="event-title" href="${escHtml(url)}" target="_blank" rel="noopener noreferrer">${title}</a>`
+      : `<span class="event-title">${title}</span>`;
+    const place = escHtml(ev.location || [ev.city, ev.country].filter(Boolean).join(', '));
+    const cat = EVENT_CAT_LABEL[ev.category] ? `<span class="ev-cat ${escHtml(ev.category)}">${EVENT_CAT_LABEL[ev.category]}</span>` : '';
     return `
       <div class="event-item">
         <div class="event-date">
-          <div class="event-month">${MONTHS_TH[d.getMonth()]}</div>
+          <div class="event-month">${escHtml(month(d))}</div>
           <div class="event-day">${d.getDate()}</div>
         </div>
         <div>
-          <a class="event-title" href="${ev.url}">${ev.title}</a>
-          <div class="event-loc">📍 ${ev.location}</div>
+          ${titleHtml}
+          <div class="ev-range">${cat}${escHtml(_evRange(ev, locale))}</div>
+          ${place ? `<div class="event-loc">📍 ${place}</div>` : ''}
         </div>
-      </div>
-    `;
+      </div>`;
   }).join('');
+}
+
+document.addEventListener('click', (e) => {
+  const tab = e.target.closest && e.target.closest('.ev-tab');
+  if (!tab) return;
+  _eventRegion = tab.dataset.region || 'all';
+  _eventsExpanded = false;
+  renderEvents();
+});
+function toggleEventsExpand(e) {
+  if (e) e.preventDefault();
+  _eventsExpanded = !_eventsExpanded;
+  renderEvents();
 }
 
 // ──────────────────────────────────────────────
